@@ -66,9 +66,11 @@ describe('getCompany()', () => {
     expect(company.num_employees).toEqual(company1.num_employees);
 
     //get a company that doesn't exist and check failure
-    expect(() => {
+    try {
       await Company.getCompany('nocompany');
-    }).toThrowError(`Cannot find a company by that handle`);
+    } catch (e) {
+      expect(e.message).toMatch('Cannot find company by that handle');
+    }
   });
 });
 
