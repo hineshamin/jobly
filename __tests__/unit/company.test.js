@@ -64,6 +64,11 @@ describe('getCompany()', () => {
     const company = await Company.getCompany(company1.handle);
     expect(company.handle).toEqual(company1.handle);
     expect(company.num_employees).toEqual(company1.num_employees);
+
+    //get a company that doesn't exist and check failure
+    expect(() => {
+      await Company.getCompany('nocompany');
+    }).toThrowError(`Cannot find a company by that handle`);
   });
 });
 
