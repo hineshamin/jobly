@@ -26,4 +26,14 @@ router.post('/', async function(req, res, next) {
   }
 });
 
+//Get a company by handle
+router.get('/:handle', async function(req, res, next) {
+  try {
+    const company = await Company.getCompany(req.params.handle);
+    return res.json({ company });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 module.exports = router;

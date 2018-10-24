@@ -55,6 +55,15 @@ describe('POST /companies', () => {
   });
 });
 
+//Test get one company route
+describe('GET /companies/:handle', () => {
+  it('should correctly return a company by handle', async function() {
+    const response = await request(app).get(`/companies/${company1.handle}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.company.handle).toBe(company1.handle);
+  });
+});
+
 //Delete companies after each tets
 afterEach(async function() {
   await db.query(`DELETE FROM companies`);
