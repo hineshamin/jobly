@@ -9,7 +9,7 @@ class Company {
     this.logo_url = logo_url;
   }
   static async getFilteredCompanies({ search, min, max }) {
-    if (min > max) {
+    if (+min > +max) {
       const error = new Error('Min cannot be greater than max');
       error.status = 400;
       throw error;
