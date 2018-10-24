@@ -63,17 +63,17 @@ class Job {
   }
 
   //Get job and return an instance
-  static async getCompany(title) {
+  static async getJob(id) {
     let result = await db.query(
       `
-    SELECT title,salary,equity,company_handle,date_posted
+    SELECT id,title,salary,equity,company_handle,date_posted
     FROM jobs 
-    WHERE title = $1`,
-      [title]
+    WHERE id = $1`,
+      [id]
     );
 
     if (result.rows.length === 0) {
-      const err = new Error('Cannot find job by that title');
+      const err = new Error('Cannot find job by that id');
       err.status = 400;
       throw err;
     }

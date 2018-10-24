@@ -74,26 +74,26 @@ describe('createJob()', () => {
   });
 });
 
-// //Test get one job
-// describe('getCompany()', () => {
-//   it('should correctly return a job by id', async function () {
-//     const job = await Job.getCompany(job1.id);
-//     expect(job.id).toEqual(job1.id);
-//     expect(job.salary).toEqual(job1.salary);
+//Test get one job
+describe('getJob()', () => {
+  it('should correctly return a job by id', async function () {
+    const job = await Job.getJob(job1.id);
+    expect(job.id).toEqual(job1.id);
+    expect(job.salary).toEqual(job1.salary);
 
-//     //get a job that doesn't exist and check failure
-//     try {
-//       await Job.getCompany('nocompany');
-//     } catch (e) {
-//       expect(e.message).toMatch('Cannot find job by that id');
-//     }
-//   });
-// });
+    //get a job that doesn't exist and check failure
+    try {
+      await Job.getJob(0);
+    } catch (e) {
+      expect(e.message).toMatch('Cannot find job by that id');
+    }
+  });
+});
 
 // //Update a job test
 // describe('updateCompany()', () => {
 //   it('should correctly update a job', async function () {
-//     const job = await Job.getCompany(job1.id);
+//     const job = await Job.getJob(job1.id);
 //     job.title = 'APPLEDRINK';
 
 //     const updatedCompany = await job.updateCompany();
@@ -111,7 +111,7 @@ describe('createJob()', () => {
 // //Delete a job test
 // describe('deleteJob()', () => {
 //   it('should correctly delete a job', async function () {
-//     const jobtobeDeleted = await Job.getCompany(job1.id);
+//     const jobtobeDeleted = await Job.getJob(job1.id);
 //     const message = await jobtobeDeleted.deleteCompany();
 //     expect(message).toBe('Job Deleted');
 //   });
