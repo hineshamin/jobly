@@ -78,6 +78,15 @@ describe('PATCH /companies/:handle', () => {
   });
 });
 
+//Test deleting a company route
+describe('DELETE /companies/:handle', () => {
+  it('should correctly delete a company', async function() {
+    const response = await request(app).delete(`/companies/${company1.handle}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe('Company Deleted');
+  });
+});
+
 //Delete companies after each tets
 afterEach(async function() {
   await db.query(`DELETE FROM companies`);

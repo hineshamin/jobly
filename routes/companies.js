@@ -49,4 +49,15 @@ router.patch('/:handle', async function(req, res, next) {
   }
 });
 
+//Delete a company
+router.delete('/:handle', async function(req, res, next) {
+  try {
+    const companyToDelete = await Company.getCompany(req.params.handle);
+    const message = await companyToDelete.deleteCompany();
+    return res.json({ message });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 module.exports = router;
