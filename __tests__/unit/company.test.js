@@ -92,6 +92,15 @@ describe('updateCompany()', () => {
   });
 });
 
+//Delete a company test
+describe('deleteCompany()', () => {
+  it('should correctly delete a company', async function() {
+    const companyToBeDeleted = await Company.getCompany(company1.handle);
+    const message = await companyToBeDeleted.deleteCompany();
+    expect(message).toBe('Company Deleted');
+  });
+});
+
 //Delete companies after each tets
 afterEach(async function() {
   await db.query(`DELETE FROM companies`);

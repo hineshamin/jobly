@@ -108,6 +108,21 @@ class Company {
 
     return new Company(result.rows[0]);
   }
+
+  //Delete company and return a message
+  async deleteCompany() {
+    const result = await db.query(
+      `
+    DELETE FROM companies 
+    WHERE handle=$1
+    RETURNING handle`,
+      [this.handle]
+    );
+    if (result.rows.length === 0) {
+      throw new Error('Could not delete company');
+    }
+    return 'Company Deleted';
+  }
 }
 
 module.exports = Company;
