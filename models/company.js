@@ -1,5 +1,5 @@
 const db = require('../db');
-const sqlForPartialUpdate = require('../helpers/partialUpdate');
+const { sqlForPartialUpdate } = require('../helpers/partialUpdate');
 
 class Company {
   constructor({ handle, name, num_employees, description, logo_url }) {

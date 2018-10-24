@@ -1,6 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const Company = require('../models/company');
+const { classPartialUpdate } = require('../helpers/partialUpdate');
 
 //Get a filtered list of companies
 router.get('/', async function(req, res, next) {
@@ -36,4 +37,16 @@ router.get('/:handle', async function(req, res, next) {
   }
 });
 
-company.handle = module.exports = router;
+//Update a company
+router.patch('/:handle', async function(req, res, next) {
+  try {
+    const companyToUpdate = await Company.getCompany(req.params.handle);
+    classPartialUpdate(companyToUpdate, req.body);
+    const updatedCompany = await companyToUpdate.updateCompany();
+    return res.json({ company: updatedCompany });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+module.exports = router;

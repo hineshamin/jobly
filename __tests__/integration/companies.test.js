@@ -51,7 +51,7 @@ describe('POST /companies', () => {
         logo_url: 'http://netflix.com'
       });
     expect(response.statusCode).toBe(200);
-    expect(response.body.company.handle).toBe('NFLX');
+    expect(response.body.company._handle).toBe('NFLX');
   });
 });
 
@@ -60,7 +60,21 @@ describe('GET /companies/:handle', () => {
   it('should correctly return a company by handle', async function() {
     const response = await request(app).get(`/companies/${company1.handle}`);
     expect(response.statusCode).toBe(200);
-    expect(response.body.company.handle).toBe(company1.handle);
+    expect(response.body.company._handle).toBe(company1.handle);
+  });
+});
+
+//Test updating a company route
+describe('PATCH /companies/:handle', () => {
+  it('should correctly update a company and return it', async function() {
+    const response = await request(app)
+      .patch(`/companies/${company1.handle}`)
+      .send({
+        name: 'PEACH'
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.company._handle).toBe(company1.handle);
+    expect(response.body.company.name).toBe('PEACH');
   });
 });
 

@@ -40,4 +40,14 @@ function sqlForPartialUpdate(table, items, key, id) {
   return { query, values };
 }
 
-module.exports = sqlForPartialUpdate;
+function classPartialUpdate(classInstance, updateObj) {
+  // Intentional: mutates in place
+  for (let [key, value] of Object.entries(updateObj)) {
+    classInstance[key] = value;
+  }
+}
+
+module.exports = {
+  sqlForPartialUpdate,
+  classPartialUpdate
+};
