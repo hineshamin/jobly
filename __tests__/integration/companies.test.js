@@ -52,6 +52,17 @@ describe('POST /companies', () => {
       });
     expect(response.statusCode).toBe(200);
     expect(response.body.company._handle).toBe('NFLX');
+
+    const invalidResponse = await request(app)
+      .post('/companies')
+      .send({
+        handle: 'NFLX',
+        name: 'Netflix',
+        num_employees: '5000',
+        description: 'American media services provider',
+        logo_url: 'bogusurl'
+      });
+    expect(invalidResponse.statusCode).toBe(400);
   });
 });
 
@@ -75,6 +86,14 @@ describe('PATCH /companies/:handle', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.company._handle).toBe(company1.handle);
     expect(response.body.company.name).toBe('PEACH');
+
+    const invalidResponse = await request(app)
+      .patch(`/companies/${company1.handle}`)
+      .send({
+        num_employees: 'PEACH',
+        name: 500
+      });
+    expect(invalidResponse.statusCode).toBe(400);
   });
 });
 

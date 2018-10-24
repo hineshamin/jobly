@@ -2,6 +2,9 @@ const express = require('express');
 const router = new express.Router();
 const Company = require('../models/company');
 const { classPartialUpdate } = require('../helpers/partialUpdate');
+const validateInput = require('../middleware/validation');
+const newCompanySchema = require('../schema/newCompany.json');
+const updateCompanySchema = require('../schema/updateCompany.json');
 
 //Get a filtered list of companies
 router.get('/', async function(req, res, next) {
@@ -18,7 +21,11 @@ router.get('/', async function(req, res, next) {
 });
 
 //Create a new company
-router.post('/', async function(req, res, next) {
+router.post('/', validateInput(newCompanySchema), async function(
+  req,
+  res,
+  next
+) {
   try {
     const company = await Company.createCompany(req.body);
     return res.json({ company });
@@ -38,7 +45,11 @@ router.get('/:handle', async function(req, res, next) {
 });
 
 //Update a company
-router.patch('/:handle', async function(req, res, next) {
+router.patch('/:handle', validateInput(updateCompanySchema), async function(
+  req,
+  res,
+  next
+) {
   try {
     const companyToUpdate = await Company.getCompany(req.params.handle);
     classPartialUpdate(companyToUpdate, req.body);
