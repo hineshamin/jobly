@@ -36,27 +36,27 @@ beforeEach(async function () {
   job2 = result4.rows[0];
 });
 
-// //Test get filtered jobs
-// describe('getFilteredCompanies()', () => {
-//   it('should correctly return a filtered list of jobs', async function () {
-//     const jobs = await Job.getFilteredCompanies({});
-//     expect(jobs.length).toEqual(2);
-//     expect(jobs[0]).toHaveProperty('id', job1.id);
-//     expect(jobs[1]).toHaveProperty('company_handle', job2.company_handle);
-//     const filteredCompaniesMin = await Job.getFilteredCompanies({
-//       min: 71000
-//     });
-//     expect(filteredCompaniesMin.length).toEqual(1);
-//     const filteredCompaniesMax = await Job.getFilteredCompanies({
-//       max: 120000
-//     });
-//     expect(filteredCompaniesMax.length).toEqual(1);
-//     const filteredCompaniesSearch = await Job.getFilteredCompanies({
-//       search: 'ogl'
-//     });
-//     expect(filteredCompaniesSearch.length).toEqual(1);
-//   });
-// });
+//Test get filtered jobs
+describe('getFilteredJobs()', () => {
+  it('should correctly return a filtered list of jobs', async function () {
+    const jobs = await Job.getFilteredJobs({});
+    expect(jobs.length).toEqual(2);
+    expect(jobs[0]).toHaveProperty('id', job1.id);
+    expect(jobs[1]).toHaveProperty('company_handle', job2.company_handle);
+    const filteredJobsSalaryMin = await Job.getFilteredJobs({
+      min_salary: 90000
+    });
+    expect(filteredJobsSalaryMin.length).toEqual(1);
+    const filteredJobsEquityMin = await Job.getFilteredJobs({
+      min_equity: 0.8
+    });
+    expect(filteredJobsEquityMin.length).toEqual(1);
+    const filteredJobsSearch = await Job.getFilteredJobs({
+      search: 'JAN'
+    });
+    expect(filteredJobsSearch.length).toEqual(1);
+  });
+});
 
 //Test creating job
 describe('createJob()', () => {
@@ -99,7 +99,7 @@ describe('createJob()', () => {
 //     const updatedCompany = await job.updateCompany();
 //     expect(updatedCompany.title).toEqual('APPLEDRINK');
 
-//     const jobs = await Job.getFilteredCompanies({});
+//     const jobs = await Job.getFilteredJobs({});
 //     expect(jobs.length).toEqual(2);
 
 //     expect(() => {

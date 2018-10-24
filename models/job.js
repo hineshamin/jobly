@@ -25,24 +25,19 @@ class Job {
   }
 
   //Get a filtered list of companies and return array of instances
-  static async getFilteredCompanies({ search, min, max }) {
-    if (+min > +max) {
-      const error = new Error('Min cannot be greater than max');
-      error.status = 400;
-      throw error;
-    }
+  static async getFilteredJobs({ search, min_salary, min_equity }) {
 
     //If search is undefined then search will be %%
     let result = await db.query(
       `
-    SELECT title,salary,equity,company_handle,date_posted
+    SELECT id,title,salary,equity,company_handle,date_posted
     FROM jobs 
-    WHERE (salary ILIKE $1 or title ILIKE $1) 
-    and equity > $2 and equity < $3`,
-      [`%${search || ''}%`, min || 0, max || 2147483646]
+    WHERE (title ILIKE $1 or company_handle ILIKE $1) 
+    and salary > $2 and equity > $3`,
+      [`%${search || ''}%`, min_salary || 0, min_equity || 0]
     );
 
-    return result.rows.map(company => new Job(company));
+    return result.rows.map(job => new Job(job));
   }
 
   //Create a new job and return an instance
@@ -67,7 +62,7 @@ class Job {
     return new Job(result.rows[0]);
   }
 
-  //Get company and return an instance
+  //Get job and return an instance
   static async getCompany(title) {
     let result = await db.query(
       `
@@ -78,7 +73,7 @@ class Job {
     );
 
     if (result.rows.length === 0) {
-      const err = new Error('Cannot find company by that title');
+      const err = new Error('Cannot find job by that title');
       err.status = 400;
       throw err;
     }
@@ -86,7 +81,7 @@ class Job {
     return new Job(result.rows[0]);
   }
 
-  //Update a company and return an instance of the updated company
+  //Update a job and return an instance of the updated job
   async updateCompany() {
     const { query, values } = sqlForPartialUpdate(
       'companies',
@@ -103,7 +98,7 @@ class Job {
     const result = await db.query(query, values);
 
     if (result.rows.length === 0) {
-      const err = new Error('Cannot find company to update');
+      const err = new Error('Cannot find job to update');
       err.status = 400;
       throw err;
     }
@@ -111,7 +106,7 @@ class Job {
     return new Job(result.rows[0]);
   }
 
-  //Delete company and return a message
+  //Delete job and return a message
   async deleteCompany() {
     const result = await db.query(
       `
@@ -121,7 +116,7 @@ class Job {
       [this.title]
     );
     if (result.rows.length === 0) {
-      throw new Error('Could not delete company');
+      throw new Error('Could not delete job');
     }
     return 'Job Deleted';
   }
