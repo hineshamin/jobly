@@ -4,7 +4,7 @@ const db = require('../../db');
 
 let company1;
 let company2;
-//Insert company before each test
+//Insert 2 companies before each test
 beforeEach(async function() {
   let result1 = await db.query(`
   INSERT INTO companies (handle,name,num_employees,description,logo_url)
@@ -19,7 +19,8 @@ beforeEach(async function() {
   company1 = result1.rows[0];
   company2 = result2.rows[0];
 });
-//Test partial update function
+
+//Test get filtered companies
 describe('getFilteredCompanies()', () => {
   it('should correctly return a filtered list of companies', async function() {
     const companies = await Company.getFilteredCompanies({});
@@ -41,7 +42,7 @@ describe('getFilteredCompanies()', () => {
   });
 });
 
-//Delete company after each tets
+//Delete companies after each tets
 afterEach(async function() {
   await db.query(`DELETE FROM companies`);
 });
