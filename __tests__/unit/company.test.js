@@ -58,6 +58,15 @@ describe('createCompany()', () => {
   });
 });
 
+//Test get one company
+describe('getCompany()', () => {
+  it('should correctly return a company by handle', async function() {
+    const company = await Company.getCompany(company1.handle);
+    expect(company.handle).toEqual(company1.handle);
+    expect(company.num_employees).toEqual(company1.num_employees);
+  });
+});
+
 //Delete companies after each tets
 afterEach(async function() {
   await db.query(`DELETE FROM companies`);

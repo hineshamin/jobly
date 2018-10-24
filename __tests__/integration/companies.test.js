@@ -25,6 +25,7 @@ beforeEach(async function() {
 describe('GET /companies', () => {
   it('should correctly return a filtered list of companies', async function() {
     const response = await request(app).get('/companies');
+    expect(response.statusCode).toBe(200);
     expect(response.body.companies.length).toBe(2);
     expect(response.body.companies[0]).toHaveProperty(
       'handle',
@@ -34,6 +35,23 @@ describe('GET /companies', () => {
       .get('/companies')
       .query({ min: 100, max: 1 });
     expect(response400.statusCode).toBe(400);
+  });
+});
+
+//Test create company route
+describe('POST /companies', () => {
+  it('should correctly create a new company and return it', async function() {
+    const response = await request(app)
+      .post('/companies')
+      .send({
+        handle: 'NFLX',
+        name: 'Netflix',
+        num_employees: 5000,
+        description: 'American media services provider',
+        logo_url: 'http://netflix.com'
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.company.handle).toBe('NFLX');
   });
 });
 
