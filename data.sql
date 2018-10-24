@@ -13,6 +13,6 @@ CREATE TABLE jobs
   title text NOT NULL,
   salary float NOT NULL,
   equity float NOT NULL CHECK(equity BETWEEN 0 and 1),
-  company_handle text REFERENCES companies,
+  company_handle text REFERENCES companies ON DELETE cascade,
   date_posted TIMESTAMP default CURRENT_TIMESTAMP 
 );
