@@ -24,6 +24,23 @@ class Company {
     );
     return result.rows.map(company => new Company(company));
   }
+
+  static async createCompany({
+    handle,
+    name,
+    num_employees,
+    description,
+    logo_url
+  }) {
+    let result = await db.query(
+      `
+    INSERT INTO companies (handle,name,num_employees,description,logo_url)
+    VALUES ($1,$2,$3,$4,$5)
+    RETURNING handle,name,num_employees,description,logo_url`,
+      [handle, name, num_employees, description, logo_url]
+    );
+    return new Company(result.rows[0]);
+  }
 }
 
 module.exports = Company;

@@ -42,6 +42,22 @@ describe('getFilteredCompanies()', () => {
   });
 });
 
+//Test creating company
+describe('createCompany()', () => {
+  it('should correctly add a company', async function() {
+    const newCompany = await Company.createCompany({
+      handle: 'NFLX',
+      name: 'Netflix',
+      num_employees: 5000,
+      description: 'American media services provider',
+      logo_url: 'http://netflix.com'
+    });
+    expect(newCompany.handle).toEqual('NFLX');
+    const companies = await Company.getFilteredCompanies({});
+    expect(companies.length).toEqual(3);
+  });
+});
+
 //Delete companies after each tets
 afterEach(async function() {
   await db.query(`DELETE FROM companies`);
