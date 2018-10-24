@@ -30,6 +30,8 @@ class Company {
       error.status = 400;
       throw error;
     }
+
+    //If search is undefined then search will be %%
     let result = await db.query(
       `
     SELECT handle,name,num_employees,description,logo_url
