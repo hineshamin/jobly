@@ -20,8 +20,8 @@ function sqlForPartialUpdate(table, items, key, id) {
 
   // filter out keys that start with "_" -- we don't want these in DB
   for (let key in items) {
-    if (key.startsWith("_")) {
-      delete items[key]
+    if (key.startsWith('_')) {
+      delete items[key];
     }
   }
 
@@ -31,14 +31,13 @@ function sqlForPartialUpdate(table, items, key, id) {
   }
 
   // build query
-  let cols = columns.join(", ");
+  let cols = columns.join(', ');
   let query = `UPDATE ${table} SET ${cols} WHERE ${key}=$${idx} RETURNING *`;
 
   let values = Object.values(items);
   values.push(id);
 
-  return {query, values};
+  return { query, values };
 }
-
 
 module.exports = sqlForPartialUpdate;
