@@ -34,22 +34,22 @@ beforeEach(async function () {
   job2 = result4.rows[0];
 });
 
-// //Test get filtered jobs route
-// describe('GET /jobs', () => {
-//   it('should correctly return a filtered list of jobs', async function () {
-//     const response = await request(app).get('/jobs');
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.jobs.length).toBe(2);
-//     expect(response.body.jobs[0]).toHaveProperty(
-//       'handle',
-//       company1.handle
-//     );
-//     const response400 = await request(app)
-//       .get('/jobs')
-//       .query({ min: 100, max: 1 });
-//     expect(response400.statusCode).toBe(400);
-//   });
-// });
+//Test get filtered jobs route
+describe('GET /jobs', () => {
+  it('should correctly return a filtered list of jobs', async function () {
+    const response = await request(app).get('/jobs');
+    expect(response.statusCode).toBe(200);
+    expect(response.body.jobs.length).toBe(2);
+    expect(response.body.jobs[0]).toHaveProperty(
+      'title',
+      job1.title
+    );
+    expect(response.body.jobs[1]).toHaveProperty(
+      'company_handle',
+      job2.company_handle
+    );
+  });
+});
 
 //Test create job route
 describe('POST /jobs', () => {

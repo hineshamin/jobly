@@ -4,19 +4,19 @@ const Job = require('../models/job');
 const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
 
-// //Get a filtered list of companies
-// router.get('/', async function (req, res, next) {
-//   try {
-//     const companiesResults = await Job.getFilteredCompanies(req.query);
-//     const companies = companiesResults.map(job => ({
-//       name: job.name,
-//       handle: job.handle
-//     }));
-//     return res.json({ companies });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Get a filtered list of jobs
+router.get('/', async function (req, res, next) {
+  try {
+    const jobsResults = await Job.getFilteredJobs(req.query);
+    const jobs = jobsResults.map(job => ({
+      title: job.title,
+      company_handle: job.company_handle
+    }));
+    return res.json({ jobs });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 //Create a new job
 router.post('/', async function (
