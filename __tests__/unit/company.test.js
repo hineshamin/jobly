@@ -67,6 +67,24 @@ describe('getCompany()', () => {
   });
 });
 
+//Update a company test
+describe('updateCompany()', () => {
+  it('should correctly update a company', async function() {
+    const company = await Company.getCompany(company1.handle);
+    company.name = 'APPLEDRINK';
+
+    const updatedCompany = await company.updateCompany();
+    expect(updatedCompany.name).toEqual('APPLEDRINK');
+
+    const companies = await Company.getFilteredCompanies({});
+    expect(companies.length).toEqual(2);
+
+    expect(() => {
+      company.handle = 'THISSHOULDFAIL';
+    }).toThrowError(`Can't change company handle!`);
+  });
+});
+
 //Delete companies after each tets
 afterEach(async function() {
   await db.query(`DELETE FROM companies`);

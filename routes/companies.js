@@ -36,4 +36,4 @@ router.get('/:handle', async function(req, res, next) {
   }
 });
 
-module.exports = router;
+company.handle = module.exports = router;

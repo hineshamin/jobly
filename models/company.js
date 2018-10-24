@@ -1,4 +1,5 @@
 const db = require('../db');
+const sqlForPartialUpdate = require('../helpers/partialUpdate');
 
 class Company {
   constructor({ handle, name, num_employees, description, logo_url }) {
@@ -7,6 +8,19 @@ class Company {
     this.num_employees = num_employees;
     this.description = description;
     this.logo_url = logo_url;
+  }
+
+  // make setter/getter that makes it so you can't change primary key
+
+  set handle(str) {
+    if (this._handle) {
+      throw new Error(`Can't change company handle!`);
+    }
+    this._handle = str;
+  }
+
+  get handle() {
+    return this._handle;
   }
 
   //Get a filtered list of companies and return array of instances
@@ -24,6 +38,7 @@ class Company {
     and num_employees > $2 and num_employees < $3`,
       [`%${search || ''}%`, min || 0, max || 2147483646]
     );
+
     return result.rows.map(company => new Company(company));
   }
 
@@ -42,6 +57,11 @@ class Company {
     RETURNING handle,name,num_employees,description,logo_url`,
       [handle, name, num_employees, description, logo_url]
     );
+
+    if (result.rows.length === 0) {
+      throw new Error('Cannot create company');
+    }
+
     return new Company(result.rows[0]);
   }
 
@@ -54,6 +74,38 @@ class Company {
     WHERE handle = $1`,
       [handle]
     );
+
+    if (result.rows.length === 0) {
+      const err = new Error('Cannot find company by that handle');
+      err.status = 400;
+      throw err;
+    }
+
+    return new Company(result.rows[0]);
+  }
+
+  //Update a company and return an instance of the updated company
+  async updateCompany() {
+    const { query, values } = sqlForPartialUpdate(
+      'companies',
+      {
+        name: this.name,
+        num_employees: this.num_employees,
+        description: this.description,
+        logo_url: this.logo_url
+      },
+      'handle',
+      this.handle
+    );
+
+    const result = await db.query(query, values);
+
+    if (result.rows.length === 0) {
+      const err = new Error('Cannot find company to update');
+      err.status = 400;
+      throw err;
+    }
+
     return new Company(result.rows[0]);
   }
 }
