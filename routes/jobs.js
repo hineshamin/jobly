@@ -32,24 +32,24 @@ router.post('/', async function (
   }
 });
 
-// //Get a job by handle
-// router.get('/:handle', async function (req, res, next) {
-//   try {
-//     const job = await Company.getCompany(req.params.handle);
-//     return res.json({ job });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Get a job by id
+router.get('/:id', async function (req, res, next) {
+  try {
+    const job = await Job.getJob(req.params.id);
+    return res.json({ job });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 // //Update a job
-// router.patch('/:handle', validateInput(updateCompanySchema), async function (
+// router.patch('/:id', validateInput(updateCompanySchema), async function (
 //   req,
 //   res,
 //   next
 // ) {
 //   try {
-//     const companyToUpdate = await Company.getCompany(req.params.handle);
+//     const companyToUpdate = await Job.getJob(req.params.id);
 //     classPartialUpdate(companyToUpdate, req.body);
 //     const updatedCompany = await companyToUpdate.updateCompany();
 //     return res.json({ job: updatedCompany });
@@ -59,9 +59,9 @@ router.post('/', async function (
 // });
 
 // //Delete a job
-// router.delete('/:handle', async function (req, res, next) {
+// router.delete('/:id', async function (req, res, next) {
 //   try {
-//     const companyToDelete = await Company.getCompany(req.params.handle);
+//     const companyToDelete = await Job.getJob(req.params.id);
 //     const message = await companyToDelete.deleteCompany();
 //     return res.json({ message });
 //   } catch (error) {

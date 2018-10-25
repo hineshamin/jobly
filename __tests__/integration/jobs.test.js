@@ -78,29 +78,29 @@ describe('POST /jobs', () => {
   });
 });
 
-// //Test get one job route
-// describe('GET /jobs/:handle', () => {
-//   it('should correctly return a job by handle', async function () {
-//     const response = await request(app).get(`/jobs/${company1.handle}`);
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.job._handle).toBe(company1.handle);
-//   });
-// });
+//Test get one job route
+describe('GET /jobs/:id', () => {
+  it('should correctly return a job by id', async function () {
+    const response = await request(app).get(`/jobs/${job1.id}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.job._id).toBe(job1.id);
+  });
+});
 
 // //Test updating a job route
-// describe('PATCH /jobs/:handle', () => {
+// describe('PATCH /jobs/:id', () => {
 //   it('should correctly update a job and return it', async function () {
 //     const response = await request(app)
-//       .patch(`/jobs/${company1.handle}`)
+//       .patch(`/jobs/${job1.id}`)
 //       .send({
 //         name: 'PEACH'
 //       });
 //     expect(response.statusCode).toBe(200);
-//     expect(response.body.job._handle).toBe(company1.handle);
+//     expect(response.body.job._handle).toBe(job1.id);
 //     expect(response.body.job.name).toBe('PEACH');
 
 //     const invalidResponse = await request(app)
-//       .patch(`/jobs/${company1.handle}`)
+//       .patch(`/jobs/${job1.id}`)
 //       .send({
 //         num_employees: 'PEACH',
 //         name: 500
@@ -110,9 +110,9 @@ describe('POST /jobs', () => {
 // });
 
 // //Test deleting a job route
-// describe('DELETE /jobs/:handle', () => {
+// describe('DELETE /jobs/:id', () => {
 //   it('should correctly delete a job', async function () {
-//     const response = await request(app).delete(`/jobs/${company1.handle}`);
+//     const response = await request(app).delete(`/jobs/${company1.id}`);
 //     expect(response.statusCode).toBe(200);
 //     expect(response.body.message).toBe('Company Deleted');
 //   });
