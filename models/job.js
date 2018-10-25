@@ -24,7 +24,7 @@ class Job {
     return this._id;
   }
 
-  //Get a filtered list of companies and return array of instances
+  //Get a filtered list of jobs and return array of instances
   static async getFilteredJobs({ search, min_salary, min_equity }) {
 
     //If search is undefined then search will be %%
@@ -82,19 +82,18 @@ class Job {
   }
 
   //Update a job and return an instance of the updated job
-  async updateCompany() {
+  async updateJob() {
     const { query, values } = sqlForPartialUpdate(
-      'companies',
+      'jobs',
       {
+        title: this.title,
         salary: this.salary,
         equity: this.equity,
         company_handle: this.company_handle,
-        date_posted: this.date_posted
       },
-      'title',
-      this.title
+      'id',
+      this.id
     );
-
     const result = await db.query(query, values);
 
     if (result.rows.length === 0) {
@@ -110,10 +109,10 @@ class Job {
   async deleteCompany() {
     const result = await db.query(
       `
-    DELETE FROM companies 
-    WHERE title=$1
-    RETURNING title`,
-      [this.title]
+    DELETE FROM jobs 
+    WHERE id=$1
+    RETURNING id`,
+      [this.id]
     );
     if (result.rows.length === 0) {
       throw new Error('Could not delete job');

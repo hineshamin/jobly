@@ -69,8 +69,8 @@ describe('createJob()', () => {
     });
     expect(newJob).toHaveProperty('id');
     expect(newJob.salary).toEqual(5000);
-    // const jobs = await Job.getFilteredJobs({});
-    // expect(jobs.length).toEqual(3);
+    const jobs = await Job.getFilteredJobs({});
+    expect(jobs.length).toEqual(3);
   });
 });
 
@@ -90,23 +90,23 @@ describe('getJob()', () => {
   });
 });
 
-// //Update a job test
-// describe('updateCompany()', () => {
-//   it('should correctly update a job', async function () {
-//     const job = await Job.getJob(job1.id);
-//     job.title = 'APPLEDRINK';
+//Update a job test
+describe('updateJob()', () => {
+  it('should correctly update a job', async function () {
+    const job = await Job.getJob(job1.id);
+    job.title = 'WINDOW WASHER';
 
-//     const updatedCompany = await job.updateCompany();
-//     expect(updatedCompany.title).toEqual('APPLEDRINK');
+    const updatedJob = await job.updateJob();
+    expect(updatedJob.title).toEqual('WINDOW WASHER');
 
-//     const jobs = await Job.getFilteredJobs({});
-//     expect(jobs.length).toEqual(2);
+    const jobs = await Job.getFilteredJobs({});
+    expect(jobs.length).toEqual(2);
 
-//     expect(() => {
-//       job.id = 'THISSHOULDFAIL';
-//     }).toThrowError(`Can't change job id!`);
-//   });
-// });
+    expect(() => {
+      job.id = 0;
+    }).toThrowError(`Can't change job id!`);
+  });
+});
 
 // //Delete a job test
 // describe('deleteJob()', () => {
