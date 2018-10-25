@@ -3,8 +3,8 @@ const router = new express.Router();
 const User = require('../models/user');
 const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
-// const newUserSchema = require('../schema/newUser.json');
-// const updateUserSchema = require('../schema/updateUser.json');
+const newUserSchema = require('../schema/newUser.json');
+const updateUserSchema = require('../schema/updateUser.json');
 
 //Get a filtered list of users
 router.get('/', async function (req, res, next) {
