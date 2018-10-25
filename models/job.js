@@ -106,9 +106,8 @@ class Job {
   }
 
   //Delete job and return a message
-  async deleteCompany() {
-    const result = await db.query(
-      `
+  async deleteJob() {
+    const result = await db.query(`
     DELETE FROM jobs 
     WHERE id=$1
     RETURNING id`,

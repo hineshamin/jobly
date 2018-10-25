@@ -108,14 +108,14 @@ describe('updateJob()', () => {
   });
 });
 
-// //Delete a job test
-// describe('deleteJob()', () => {
-//   it('should correctly delete a job', async function () {
-//     const jobtobeDeleted = await Job.getJob(job1.id);
-//     const message = await jobtobeDeleted.deleteCompany();
-//     expect(message).toBe('Job Deleted');
-//   });
-// });
+//Delete a job test
+describe('deleteJob()', () => {
+  it('should correctly delete a job', async function () {
+    const jobtobeDeleted = await Job.getJob(job1.id);
+    const message = await jobtobeDeleted.deleteJob();
+    expect(message).toBe('Job Deleted');
+  });
+});
 
 //Delete jobs and companies tables after each tets
 afterEach(async function () {
