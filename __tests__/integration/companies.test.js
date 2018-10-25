@@ -7,6 +7,28 @@ let job1, job2, company1, company2;
 //Insert 2 jobs and commpanies before each test
 beforeEach(async function () {
   //adding companies and related jobs for testing
+  //build up our test tables
+  await db.query(`
+    CREATE TABLE companies
+    (
+      handle text PRIMARY KEY,
+      name text NOT NULL UNIQUE,
+      num_employees int,
+      description text,
+      logo_url text
+    )
+  `)
+  await db.query(`      
+    CREATE TABLE jobs
+    (
+      id SERIAL PRIMARY KEY,
+      title text NOT NULL,
+      salary float NOT NULL,
+      equity float NOT NULL CHECK(equity BETWEEN 0 and 1),
+      company_handle text REFERENCES companies ON DELETE cascade,
+      date_posted TIMESTAMP default CURRENT_TIMESTAMP
+    )
+  `)
   let result1 = await db.query(`
   INSERT INTO companies (handle,name,num_employees,description,logo_url)
   VALUES ('AAPL','apple',123000,'Maker of hipster computers','http://www.apllogo.com')
@@ -123,7 +145,8 @@ describe('DELETE /companies/:handle', () => {
 
 //Delete companies after each tets
 afterEach(async function () {
-  await db.query(`DELETE FROM companies`);
+  await db.query(`DROP TABLE jobs`);
+  await db.query(`DROP TABLE companies`);
 });
 
 //Close db connection

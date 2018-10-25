@@ -5,7 +5,17 @@ const db = require('../../db');
 let company1;
 let company2;
 //Insert 2 companies before each test
-beforeEach(async function() {
+beforeEach(async function () {
+  await db.query(`
+  CREATE TABLE companies
+  (
+    handle text PRIMARY KEY,
+    name text NOT NULL UNIQUE,
+    num_employees int,
+    description text,
+    logo_url text
+  )
+  `)
   let result1 = await db.query(`
   INSERT INTO companies (handle,name,num_employees,description,logo_url)
   VALUES ('AAPL','apple',123000,'Maker of hipster computers','http://www.apllogo.com')
@@ -22,7 +32,7 @@ beforeEach(async function() {
 
 //Test get filtered companies
 describe('getFilteredCompanies()', () => {
-  it('should correctly return a filtered list of companies', async function() {
+  it('should correctly return a filtered list of companies', async function () {
     const companies = await Company.getFilteredCompanies({});
     expect(companies.length).toEqual(2);
     expect(companies[0]).toHaveProperty('handle', company1.handle);
@@ -53,7 +63,7 @@ describe('getFilteredCompanies()', () => {
 
 //Test creating company
 describe('createCompany()', () => {
-  it('should correctly add a company', async function() {
+  it('should correctly add a company', async function () {
     const newCompany = await Company.createCompany({
       handle: 'NFLX',
       name: 'Netflix',
@@ -69,7 +79,7 @@ describe('createCompany()', () => {
 
 //Test get one company
 describe('getCompany()', () => {
-  it('should correctly return a company by handle', async function() {
+  it('should correctly return a company by handle', async function () {
     const company = await Company.getCompany(company1.handle);
     expect(company.handle).toEqual(company1.handle);
     expect(company.num_employees).toEqual(company1.num_employees);
@@ -85,7 +95,7 @@ describe('getCompany()', () => {
 
 //Update a company test
 describe('updateCompany()', () => {
-  it('should correctly update a company', async function() {
+  it('should correctly update a company', async function () {
     let company = await Company.getCompany(company1.handle);
     company.name = 'APPLEDRINK';
 
@@ -104,7 +114,7 @@ describe('updateCompany()', () => {
 
 //Delete a company test
 describe('deleteCompany()', () => {
-  it('should correctly delete a company', async function() {
+  it('should correctly delete a company', async function () {
     const companyToBeDeleted = await Company.getCompany(company1.handle);
     const message = await companyToBeDeleted.deleteCompany();
     expect(message).toBe('Company Deleted');
@@ -112,11 +122,11 @@ describe('deleteCompany()', () => {
 });
 
 //Delete companies after each tets
-afterEach(async function() {
-  await db.query(`DELETE FROM companies`);
+afterEach(async function () {
+  await db.query(`DROP TABLE companies`);
 });
 
 //Close db connection
-afterAll(async function() {
+afterAll(async function () {
   await db.end();
 });
