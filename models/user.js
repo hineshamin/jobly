@@ -104,10 +104,11 @@ class User /* extends Model */ {
     const { query, values } = sqlForPartialUpdate(
       'users',
       {
-        password: this.password,
+        username: this.username,
         first_name: this.first_name,
         last_name: this.last_name,
-        email: this.email
+        email: this.email,
+        photo_url: this.photo_url
       },
       'username',
       this.username

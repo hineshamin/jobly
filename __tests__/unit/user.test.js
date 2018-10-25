@@ -97,25 +97,25 @@ describe('getUser()', () => {
   });
 });
 
-// //Update a user test
-// describe('updateUser()', () => {
-//   it('should correctly update a user', async function() {
-//     let user = await User.getUser(user1.username);
-//     user.title = 'WINDOW WASHER';
+//Update a user test
+describe('updateUser()', () => {
+  it('should correctly update a user', async function () {
+    let user = await User.getUser(user1.username);
+    user.first_name = 'Josephina';
 
-//     await user.save();
+    await user.save();
 
-//     user = await User.getUser(user1.username);
-//     expect(user.title).toEqual('WINDOW WASHER');
+    user = await User.getUser(user1.username);
+    expect(user.first_name).toEqual('Josephina');
 
-//     const users = await User.getUsers({});
-//     expect(users.length).toEqual(2);
+    const users = await User.getUsers({});
+    expect(users.length).toEqual(2);
 
-//     expect(() => {
-//       user.username = 0;
-//     }).toThrowError(`Can't change user username!`);
-//   });
-// });
+    expect(() => {
+      user.username = 'JosephinaRocketina';
+    }).toThrowError(`Can't change username!`);
+  });
+});
 
 // //Delete a user test
 // describe('deleteUser()', () => {
