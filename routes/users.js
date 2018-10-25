@@ -17,7 +17,7 @@ router.get('/', async function (req, res, next) {
 });
 
 //Create a new user
-router.post('/', async function (req, res, next) {
+router.post('/', validateInput(newUserSchema), async function (req, res, next) {
   try {
     const user = await User.createUser(req.body);
     return res.json({ user });
@@ -37,7 +37,7 @@ router.get('/:username', async function (req, res, next) {
 });
 
 //Update a user
-router.patch('/:username', async function (
+router.patch('/:username', validateInput(updateUserSchema), async function (
   req,
   res,
   next

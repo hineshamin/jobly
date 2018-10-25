@@ -72,15 +72,16 @@ describe('POST /users', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.user._username).toBe('bobcat');
 
-    // const invalidResponse = await request(app)
-    //   .post('/users')
-    //   .send({
-    //     title: 'SOFTWARE DEVELOPER',
-    //     salary: 'FiveThousand',
-    //     equity: 'janitorlevel',
-    //     company_handle: 20
-    //   });
-    // expect(invalidResponse.statusCode).toBe(400);
+    const invalidResponse = await request(app)
+      .post('/users')
+      .send({
+        username: 'bobcat',
+        password: 'bob',
+        first_name: 'bob',
+        last_name: 'johnson',
+        email: 'bob.com'
+      });
+    expect(invalidResponse.statusCode).toBe(400);
   });
 });
 
@@ -107,13 +108,13 @@ describe('PATCH /users/:username', () => {
     expect(response.body.user._username).toBe(user1.username);
     expect(response.body.user.first_name).toBe('Josephina');
 
-    // const invalidResponse = await request(app)
-    //   .patch(`/users/${user1.username}`)
-    //   .send({
-    //     first_name: 20,
-    //     equity: 500
-    //   });
-    // expect(invalidResponse.statusCode).toBe(400);
+    const invalidResponse = await request(app)
+      .patch(`/users/${user1.username}`)
+      .send({
+        first_name: 20,
+        last_name: null
+      });
+    expect(invalidResponse.statusCode).toBe(400);
   });
 });
 
