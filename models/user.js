@@ -64,7 +64,7 @@ class User /* extends Model */ {
         last_name,
         email,
         photo_url ||
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
         is_admin || false
       ]
     );
@@ -80,14 +80,14 @@ class User /* extends Model */ {
   static async getUser(username) {
     let result = await db.query(
       `
-    SELECT username, password, first_name, last_name, email, photo_url
+    SELECT username, first_name, last_name, email, photo_url
     FROM users 
     WHERE username = $1`,
       [username]
     );
 
     if (result.rows.length === 0) {
-      const err = new Error('Cannot find user by that username');
+      const err = new Error(`Cannot find user by username: ${username}`);
       err.status = 400;
       throw err;
     }
