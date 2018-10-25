@@ -132,7 +132,7 @@ class User /* extends Model */ {
       [this.username]
     );
     if (result.rows.length === 0) {
-      throw new Error('Could not delete user');
+      throw new Error(`Could not delete user: ${this.username}`);
     }
     return 'User Deleted';
   }

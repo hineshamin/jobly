@@ -52,15 +52,15 @@ router.patch('/:username', async function (
   }
 });
 
-// //Delete a user
-// router.delete('/:username', async function(req, res, next) {
-//   try {
-//     const userToDelete = await User.getUser(req.params.username);
-//     const message = await userToDelete.deleteUser();
-//     return res.json({ message });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Delete a user
+router.delete('/:username', async function (req, res, next) {
+  try {
+    const user = await User.getUser(req.params.username);
+    const message = await user.deleteUser();
+    return res.json({ message });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 module.exports = router;

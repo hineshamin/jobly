@@ -117,14 +117,14 @@ describe('updateUser()', () => {
   });
 });
 
-// //Delete a user test
-// describe('deleteUser()', () => {
-//   it('should correctly delete a user', async function() {
-//     const usertobeDeleted = await User.getUser(user1.username);
-//     const message = await usertobeDeleted.deleteUser();
-//     expect(message).toBe('User Deleted');
-//   });
-// });
+//Delete a user test
+describe('deleteUser()', () => {
+  it('should correctly delete a user', async function () {
+    const user = await User.getUser(user1.username);
+    const message = await user.deleteUser();
+    expect(message).toBe('User Deleted');
+  });
+});
 
 //Delete users and companies tables after each tets
 afterEach(async function () {

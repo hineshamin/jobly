@@ -117,14 +117,14 @@ describe('PATCH /users/:username', () => {
   });
 });
 
-// //Test deleting a user route
-// describe('DELETE /users/:id', () => {
-//   it('should correctly delete a user', async function() {
-//     const response = await request(app).delete(`/users/${user1.id}`);
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.message).toBe('User Deleted');
-//   });
-// });
+//Test deleting a user route
+describe('DELETE /users/:username', () => {
+  it('should correctly delete a user', async function () {
+    const response = await request(app).delete(`/users/${user1.username}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe('User Deleted');
+  });
+});
 
 //Delete users and companies tables after each tets
 afterEach(async function () {
