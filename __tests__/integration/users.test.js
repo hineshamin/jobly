@@ -8,7 +8,40 @@ let job1, job2, company1, company2, user1, user2;
 //Insert 2 users before each test
 beforeEach(async function () {
   //adding companies and related users for those companies to test
-
+  //build up our test tables
+  await db.query(`
+    CREATE TABLE companies
+    (
+      handle text PRIMARY KEY,
+      name text NOT NULL UNIQUE,
+      num_employees int,
+      description text,
+      logo_url text
+    )
+  `)
+  await db.query(`      
+    CREATE TABLE jobs
+    (
+      id SERIAL PRIMARY KEY,
+      title text NOT NULL,
+      salary float NOT NULL,
+      equity float NOT NULL CHECK(equity BETWEEN 0 and 1),
+      company_handle text REFERENCES companies ON DELETE cascade,
+      date_posted TIMESTAMP default CURRENT_TIMESTAMP
+    )
+  `)
+  await db.query(`
+    CREATE TABLE users
+    (
+      username text PRIMARY KEY,
+      password text NOT NULL,
+      first_name text NOT NULL,
+      last_name text NOT NULL,
+      email text NOT NULL UNIQUE,
+      photo_url text DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
+      is_admin boolean NOT NULL default false
+    )
+  `)
   let result1 = await db.query(`
   INSERT INTO companies (handle,name,num_employees,description,logo_url)
   VALUES ('AAPL','apple',123000,'Maker of hipster computers','http://www.apllogo.com')
@@ -52,8 +85,6 @@ describe('GET /users', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.users.length).toBe(2);
     expect(response.body.users[0]).toHaveProperty('_username', user1.username);
-
-    //check catch in route
   });
 });
 
@@ -82,6 +113,26 @@ describe('POST /users', () => {
         email: 'bob.com'
       });
     expect(invalidResponse.statusCode).toBe(400);
+
+    //make fake non-existent database reference to throw
+    //error in route
+    // try {
+    //   await db.query(`DROP TABLE users`)
+    //   const response = await request(app)
+    //     .post('/users')
+    //     .send({
+    //       username: 'bobcat',
+    //       password: 'bob',
+    //       first_name: 'bob',
+    //       last_name: 'johnson',
+    //       email: 'bob@gmail.com'
+    //     });
+    // } catch (error) {
+    //   console.log('got here!');
+    //   expect(error.message).toMatch('Cannot create user');
+    // }
+    // await db.query(`CREATE TABLE users (
+    //   username text PRIMARY KEY);`)
   });
 });
 
@@ -129,9 +180,9 @@ describe('DELETE /users/:username', () => {
 
 //Delete users and companies tables after each tets
 afterEach(async function () {
-  await db.query(`DELETE FROM users`);
-  await db.query(`DELETE FROM companies`);
-  await db.query(`DELETE FROM users`);
+  await db.query(`DROP TABLE jobs;`);
+  await db.query(`DROP TABLE companies;`);
+  await db.query(`DROP TABLE users;`);
 });
 
 //Close db connection

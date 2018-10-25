@@ -6,7 +6,7 @@ const validateInput = require('../middleware/validation');
 const newUserSchema = require('../schema/newUser.json');
 const updateUserSchema = require('../schema/updateUser.json');
 
-//Get a filtered list of users
+//Get a list of users
 router.get('/', async function (req, res, next) {
   try {
     const users = await User.getUsers();

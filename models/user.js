@@ -39,6 +39,8 @@ class User /* extends Model */ {
     FROM users`
     );
 
+
+
     return result.rows.map(user => new User(user));
   }
 
