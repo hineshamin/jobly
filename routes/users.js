@@ -19,8 +19,9 @@ router.get('/', async function (req, res, next) {
 //Create a new user
 router.post('/', validateInput(newUserSchema), async function (req, res, next) {
   try {
-    const user = await User.createUser(req.body);
-    return res.json({ user });
+    await User.createUser(req.body);
+    const token = await User.authenticate(req.body);
+    return res.json({ token });
   } catch (error) {
     return next(error);
   }

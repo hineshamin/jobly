@@ -81,13 +81,13 @@ class User /* extends Model */ {
   // Authenticate user
   static async authenticate({ username, password }) {
     const result = await db.query(`
-      SELECT password FROM users WHERE username=$1
+      SELECT password, is_admin FROM users WHERE username=$1
     `, [username]
     );
     const user = result.rows[0];
     if (user) {
       if (await bcrypt.compare(password, user.password)) {
-        const token = jwt.sign({ username }, SECRET);
+        const token = jwt.sign({ username, is_admin: user.is_admin }, SECRET);
         return token;
       }
     }

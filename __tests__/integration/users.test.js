@@ -101,7 +101,7 @@ describe('POST /users', () => {
         email: 'bob@gmail.com'
       });
     expect(response.statusCode).toBe(200);
-    expect(response.body.user._username).toBe('bobcat');
+    expect(response.body).toHaveProperty('token');
 
     const invalidResponse = await request(app)
       .post('/users')
