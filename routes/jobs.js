@@ -3,6 +3,8 @@ const router = new express.Router();
 const Job = require('../models/job');
 const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
+const newJobSchema = require('../schema/newJob.json');
+const updateJobSchema = require('../schema/updateJob.json');
 
 //Get a filtered list of jobs
 router.get('/', async function (req, res, next) {
@@ -19,7 +21,7 @@ router.get('/', async function (req, res, next) {
 });
 
 //Create a new job
-router.post('/', async function (
+router.post('/', validateInput(newJobSchema), async function (
   req,
   res,
   next
@@ -43,7 +45,7 @@ router.get('/:id', async function (req, res, next) {
 });
 
 //Update a job
-router.patch('/:id', async function (
+router.patch('/:id', validateInput(updateJobSchema), async function (
   req,
   res,
   next

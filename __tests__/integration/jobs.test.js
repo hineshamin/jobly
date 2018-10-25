@@ -65,16 +65,15 @@ describe('POST /jobs', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.job.title).toBe('SOFTWARE DEVELOPER');
 
-    // const invalidResponse = await request(app)
-    //   .post('/jobs')
-    //   .send({
-    //     handle: 'NFLX',
-    //     name: 'Netflix',
-    //     num_employees: '5000',
-    //     description: 'American media services provider',
-    //     logo_url: 'bogusurl'
-    //   });
-    // expect(invalidResponse.statusCode).toBe(400);
+    const invalidResponse = await request(app)
+      .post('/jobs')
+      .send({
+        title: 'SOFTWARE DEVELOPER',
+        salary: 'FiveThousand',
+        equity: 'janitorlevel',
+        company_handle: 20,
+      });
+    expect(invalidResponse.statusCode).toBe(400);
   });
 });
 
@@ -99,13 +98,13 @@ describe('PATCH /jobs/:id', () => {
     expect(response.body.job._id).toBe(job1.id);
     expect(response.body.job.title).toBe('WINDOW WASHER');
 
-    // const invalidResponse = await request(app)
-    //   .patch(`/jobs/${job1.id}`)
-    //   .send({
-    //     num_employees: 'WINDOW WASHER',
-    //     name: 500
-    //   });
-    // expect(invalidResponse.statusCode).toBe(400);
+    const invalidResponse = await request(app)
+      .patch(`/jobs/${job1.id}`)
+      .send({
+        title: 20,
+        equity: 500
+      });
+    expect(invalidResponse.statusCode).toBe(400);
   });
 });
 
