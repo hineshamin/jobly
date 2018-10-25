@@ -4,10 +4,9 @@ const request = require('supertest');
 const app = require('../../app');
 
 let job1, job2, company1, company2;
-//Insert 2 jobs before each test
+//Insert 2 jobs and commpanies before each test
 beforeEach(async function () {
-  //adding jobs and related jobs for those jobs to test
-
+  //adding companies and related jobs for testing
   let result1 = await db.query(`
   INSERT INTO companies (handle,name,num_employees,description,logo_url)
   VALUES ('AAPL','apple',123000,'Maker of hipster computers','http://www.apllogo.com')
