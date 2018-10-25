@@ -1,0 +1,48 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "$id": "#/properties/title",
+      "type": "string",
+      "title": "The Title Schema",
+      "default": "",
+      "examples": [
+        "SOFTWARE DEVELOPER"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "salary": {
+      "$id": "#/properties/salary",
+      "type": "integer",
+      "title": "The Salary Schema",
+      "default": 0,
+      "examples": [
+        5000
+      ]
+    },
+    "equity": {
+      "$id": "#/properties/equity",
+      "type": "number",
+      "title": "The Equity Schema",
+      "default": 0.0,
+      "examples": [
+        0.01
+      ]
+    },
+    "company_handle": {
+      "$id": "#/properties/company_handle",
+      "type": "string",
+      "title": "The Company_handle Schema",
+      "default": "",
+      "examples": [
+        "GOOG"
+      ],
+      "pattern": "^(.*)$"
+    }
+  }
+}
