@@ -36,21 +36,21 @@ router.get('/:username', async function (req, res, next) {
   }
 });
 
-// //Update a user
-// router.patch('/:username', validateInput(updateUserSchema), async function(
-//   req,
-//   res,
-//   next
-// ) {
-//   try {
-//     let user = await User.getUser(req.params.username);
-//     user.updateFromValues(req.body);
-//     await user.save();
-//     return res.json({ user });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Update a user
+router.patch('/:username', async function (
+  req,
+  res,
+  next
+) {
+  try {
+    let user = await User.getUser(req.params.username);
+    user.updateFromValues(req.body);
+    await user.save();
+    return res.json({ user });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 // //Delete a user
 // router.delete('/:username', async function(req, res, next) {

@@ -95,27 +95,27 @@ describe('GET /users/:username', () => {
   });
 });
 
-// //Test updating a user route
-// describe('PATCH /users/:username', () => {
-//   it('should correctly update a user and return it', async function() {
-//     const response = await request(app)
-//       .patch(`/users/${user1.username}`)
-//       .send({
-//         title: 'WINDOW WASHER'
-//       });
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.user._id).toBe(user1.username);
-//     expect(response.body.user.title).toBe('WINDOW WASHER');
+//Test updating a user route
+describe('PATCH /users/:username', () => {
+  it('should correctly update a user and return it', async function () {
+    const response = await request(app)
+      .patch(`/users/${user1.username}`)
+      .send({
+        first_name: 'Josephina'
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.user._username).toBe(user1.username);
+    expect(response.body.user.first_name).toBe('Josephina');
 
-//     const invalidResponse = await request(app)
-//       .patch(`/users/${user1.username}`)
-//       .send({
-//         title: 20,
-//         equity: 500
-//       });
-//     expect(invalidResponse.statusCode).toBe(400);
-//   });
-// });
+    // const invalidResponse = await request(app)
+    //   .patch(`/users/${user1.username}`)
+    //   .send({
+    //     first_name: 20,
+    //     equity: 500
+    //   });
+    // expect(invalidResponse.statusCode).toBe(400);
+  });
+});
 
 // //Test deleting a user route
 // describe('DELETE /users/:id', () => {
