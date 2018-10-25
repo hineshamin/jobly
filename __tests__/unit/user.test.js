@@ -2,12 +2,7 @@ process.env.NODE_ENV = 'test';
 const User = require('../../models/user');
 const db = require('../../db');
 
-let job1;
-let job2;
-let company1;
-let company2;
-let user1;
-let user2;
+let job1, job2, company1, company2, user1, user2;
 //Insert 2 users before each test
 beforeEach(async function () {
   //adding companies and related users for those companies to test
