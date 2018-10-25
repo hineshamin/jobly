@@ -1,5 +1,8 @@
 const db = require('../db');
-const { sqlForPartialUpdate } = require('../helpers/partialUpdate');
+const {
+  sqlForPartialUpdate,
+  classPartialUpdate
+} = require('../helpers/partialUpdate');
 
 class Company {
   constructor({ handle, name, num_employees, description, logo_url }) {
@@ -34,11 +37,15 @@ class Company {
     //If search is undefined then search will be %%
     let result = await db.query(
       `
-    SELECT handle,name,num_employees,description,logo_url
+    SELECT handle, name, num_employees, description, logo_url
     FROM companies 
     WHERE (name ILIKE $1 or handle ILIKE $1) 
     and num_employees > $2 and num_employees < $3`,
-      [`%${search || ''}%`, min || 0, max || 2147483646]
+      [
+        `%${search === undefined ? '' : search}%`,
+        min === undefined ? 0 : min,
+        max === undefined ? 2147483646 : max
+      ]
     );
 
     return result.rows.map(company => new Company(company));
@@ -54,9 +61,9 @@ class Company {
   }) {
     let result = await db.query(
       `
-    INSERT INTO companies (handle,name,num_employees,description,logo_url)
-    VALUES ($1,$2,$3,$4,$5)
-    RETURNING handle,name,num_employees,description,logo_url`,
+    INSERT INTO companies (handle, name, num_employees, description, logo_url)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING handle, name, num_employees, description, logo_url`,
       [handle, name, num_employees, description, logo_url]
     );
 
@@ -71,7 +78,7 @@ class Company {
   static async getCompany(handle) {
     let result = await db.query(
       `
-    SELECT handle,name,num_employees,description,logo_url
+    SELECT handle, name, num_employees, description, logo_url
     FROM companies 
     WHERE handle = $1`,
       [handle]
@@ -86,8 +93,13 @@ class Company {
     return new Company(result.rows[0]);
   }
 
-  //Update a company and return an instance of the updated company
-  async updateCompany() {
+  //Update the company instance attributes
+  updateFromValues(vals) {
+    classPartialUpdate(this, vals);
+  }
+
+  //Update a company instance
+  async save() {
     const { query, values } = sqlForPartialUpdate(
       'companies',
       {
@@ -107,8 +119,6 @@ class Company {
       err.status = 400;
       throw err;
     }
-
-    return new Company(result.rows[0]);
   }
 
   //Delete company and return a message

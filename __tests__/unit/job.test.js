@@ -7,7 +7,7 @@ let job2;
 let company1;
 let company2;
 //Insert 2 jobs before each test
-beforeEach(async function () {
+beforeEach(async function() {
   //adding companies and related jobs for those companies to test
 
   let result1 = await db.query(`
@@ -38,7 +38,7 @@ beforeEach(async function () {
 
 //Test get filtered jobs
 describe('getFilteredJobs()', () => {
-  it('should correctly return a filtered list of jobs', async function () {
+  it('should correctly return a filtered list of jobs', async function() {
     const jobs = await Job.getFilteredJobs({});
     expect(jobs.length).toEqual(2);
     expect(jobs[0]).toHaveProperty('id', job1.id);
@@ -60,12 +60,12 @@ describe('getFilteredJobs()', () => {
 
 //Test creating job
 describe('createJob()', () => {
-  it('should correctly add a job', async function () {
+  it('should correctly add a job', async function() {
     const newJob = await Job.createJob({
       title: 'SOFTWARE DEVELOPER',
       salary: 5000,
       equity: 0.01,
-      company_handle: 'GOOG',
+      company_handle: 'GOOG'
     });
     expect(newJob).toHaveProperty('id');
     expect(newJob.salary).toEqual(5000);
@@ -76,7 +76,7 @@ describe('createJob()', () => {
 
 //Test get one job
 describe('getJob()', () => {
-  it('should correctly return a job by id', async function () {
+  it('should correctly return a job by id', async function() {
     const job = await Job.getJob(job1.id);
     expect(job.id).toEqual(job1.id);
     expect(job.salary).toEqual(job1.salary);
@@ -92,12 +92,14 @@ describe('getJob()', () => {
 
 //Update a job test
 describe('updateJob()', () => {
-  it('should correctly update a job', async function () {
-    const job = await Job.getJob(job1.id);
+  it('should correctly update a job', async function() {
+    let job = await Job.getJob(job1.id);
     job.title = 'WINDOW WASHER';
 
-    const updatedJob = await job.updateJob();
-    expect(updatedJob.title).toEqual('WINDOW WASHER');
+    await job.save();
+
+    job = await Job.getJob(job1.id);
+    expect(job.title).toEqual('WINDOW WASHER');
 
     const jobs = await Job.getFilteredJobs({});
     expect(jobs.length).toEqual(2);
@@ -110,7 +112,7 @@ describe('updateJob()', () => {
 
 //Delete a job test
 describe('deleteJob()', () => {
-  it('should correctly delete a job', async function () {
+  it('should correctly delete a job', async function() {
     const jobtobeDeleted = await Job.getJob(job1.id);
     const message = await jobtobeDeleted.deleteJob();
     expect(message).toBe('Job Deleted');
@@ -118,12 +120,12 @@ describe('deleteJob()', () => {
 });
 
 //Delete jobs and companies tables after each tets
-afterEach(async function () {
+afterEach(async function() {
   await db.query(`DELETE FROM jobs`);
   await db.query(`DELETE FROM companies`);
 });
 
 //Close db connection
-afterAll(async function () {
+afterAll(async function() {
   await db.end();
 });

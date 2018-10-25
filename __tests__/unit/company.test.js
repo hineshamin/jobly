@@ -39,6 +39,15 @@ describe('getFilteredCompanies()', () => {
       search: 'ogl'
     });
     expect(filteredCompaniesSearch.length).toEqual(1);
+
+    try {
+      const filtered400 = await Company.getFilteredCompanies({
+        min: 100,
+        max: 0
+      });
+    } catch (e) {
+      expect(e.message).toMatch('Min cannot be greater than max');
+    }
   });
 });
 
@@ -77,11 +86,12 @@ describe('getCompany()', () => {
 //Update a company test
 describe('updateCompany()', () => {
   it('should correctly update a company', async function() {
-    const company = await Company.getCompany(company1.handle);
+    let company = await Company.getCompany(company1.handle);
     company.name = 'APPLEDRINK';
 
-    const updatedCompany = await company.updateCompany();
-    expect(updatedCompany.name).toEqual('APPLEDRINK');
+    await company.save();
+    company = await Company.getCompany(company1.handle);
+    expect(company.name).toEqual('APPLEDRINK');
 
     const companies = await Company.getFilteredCompanies({});
     expect(companies.length).toEqual(2);
