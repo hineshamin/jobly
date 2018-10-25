@@ -6,6 +6,40 @@ let job1, job2, company1, company2, user1, user2;
 //Insert 2 users before each test
 beforeEach(async function () {
   //adding companies and related users for those companies to test
+  //build up our test tables
+  await db.query(`
+    CREATE TABLE companies
+    (
+      handle text PRIMARY KEY,
+      name text NOT NULL UNIQUE,
+      num_employees int,
+      description text,
+      logo_url text
+    )
+  `)
+  await db.query(`      
+    CREATE TABLE jobs
+    (
+      id SERIAL PRIMARY KEY,
+      title text NOT NULL,
+      salary float NOT NULL,
+      equity float NOT NULL CHECK(equity BETWEEN 0 and 1),
+      company_handle text REFERENCES companies ON DELETE cascade,
+      date_posted TIMESTAMP default CURRENT_TIMESTAMP
+    )
+  `)
+  await db.query(`
+    CREATE TABLE users
+    (
+      username text PRIMARY KEY,
+      password text NOT NULL,
+      first_name text NOT NULL,
+      last_name text NOT NULL,
+      email text NOT NULL UNIQUE,
+      photo_url text DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
+      is_admin boolean NOT NULL default false
+    )
+  `)
 
   let result1 = await db.query(`
   INSERT INTO companies (handle,name,num_employees,description,logo_url)
@@ -97,6 +131,30 @@ describe('getUser()', () => {
   });
 });
 
+//Authenticate one user
+describe('authenticate()', () => {
+  it('should correctly return a json web token', async function () {
+    const newUser = await User.createUser({
+      username: 'bobcat',
+      password: 'bob',
+      first_name: 'bob',
+      last_name: 'johnson',
+      email: 'bob@gmail.com'
+    });
+
+    const token = await User.authenticate({ username: newUser.username, password: 'bob' });
+    expect(token !== undefined).toEqual(true);
+    expect(token === 'bob').toEqual(false);
+
+    // try wrong password and catch error
+    try {
+      await User.authenticate(newUser.username, 'wrongpass');
+    } catch (e) {
+      expect(e.message).toMatch(`Invalid username/password`);
+    }
+  });
+});
+
 //Update a user test
 describe('updateUser()', () => {
   it('should correctly update a user', async function () {
@@ -128,9 +186,9 @@ describe('deleteUser()', () => {
 
 //Delete users and companies tables after each tets
 afterEach(async function () {
-  await db.query(`DELETE FROM users`);
-  await db.query(`DELETE FROM companies`);
-  await db.query(`DELETE from jobs`);
+  await db.query(`DROP TABLE jobs`);
+  await db.query(`DROP TABLE users`);
+  await db.query(`DROP TABLE companies`);
 });
 
 //Close db connection

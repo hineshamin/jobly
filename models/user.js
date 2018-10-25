@@ -39,10 +39,10 @@ class User /* extends Model */ {
     FROM users`
     );
 
-
-
     return result.rows.map(user => new User(user));
   }
+
+
 
   //Create a new user and return an instance
   static async createUser({
@@ -76,6 +76,22 @@ class User /* extends Model */ {
     }
 
     return new User(result.rows[0]);
+  }
+
+  // Authenticate user
+  static async authenticate({ username, password }) {
+    const result = await db.query(`
+      SELECT password FROM users WHERE username=$1
+    `, [username]
+    );
+    const user = result.rows[0];
+    if (user) {
+      if (await bcrypt.compare(password, user.password)) {
+        const token = jwt.sign({ username }, SECRET);
+        return token;
+      }
+    }
+    throw new Error('Invalid username/password')
   }
 
   //Get user and return an instance
