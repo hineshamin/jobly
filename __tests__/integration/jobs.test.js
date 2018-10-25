@@ -87,27 +87,27 @@ describe('GET /jobs/:id', () => {
   });
 });
 
-// //Test updating a job route
-// describe('PATCH /jobs/:id', () => {
-//   it('should correctly update a job and return it', async function () {
-//     const response = await request(app)
-//       .patch(`/jobs/${job1.id}`)
-//       .send({
-//         name: 'PEACH'
-//       });
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.job._handle).toBe(job1.id);
-//     expect(response.body.job.name).toBe('PEACH');
+//Test updating a job route
+describe('PATCH /jobs/:id', () => {
+  it('should correctly update a job and return it', async function () {
+    const response = await request(app)
+      .patch(`/jobs/${job1.id}`)
+      .send({
+        title: 'WINDOW WASHER'
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.job._id).toBe(job1.id);
+    expect(response.body.job.title).toBe('WINDOW WASHER');
 
-//     const invalidResponse = await request(app)
-//       .patch(`/jobs/${job1.id}`)
-//       .send({
-//         num_employees: 'PEACH',
-//         name: 500
-//       });
-//     expect(invalidResponse.statusCode).toBe(400);
-//   });
-// });
+    // const invalidResponse = await request(app)
+    //   .patch(`/jobs/${job1.id}`)
+    //   .send({
+    //     num_employees: 'WINDOW WASHER',
+    //     name: 500
+    //   });
+    // expect(invalidResponse.statusCode).toBe(400);
+  });
+});
 
 // //Test deleting a job route
 // describe('DELETE /jobs/:id', () => {

@@ -42,21 +42,21 @@ router.get('/:id', async function (req, res, next) {
   }
 });
 
-// //Update a job
-// router.patch('/:id', validateInput(updateCompanySchema), async function (
-//   req,
-//   res,
-//   next
-// ) {
-//   try {
-//     const companyToUpdate = await Job.getJob(req.params.id);
-//     classPartialUpdate(companyToUpdate, req.body);
-//     const updatedCompany = await companyToUpdate.updateCompany();
-//     return res.json({ job: updatedCompany });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Update a job
+router.patch('/:id', async function (
+  req,
+  res,
+  next
+) {
+  try {
+    const jobToUpdate = await Job.getJob(req.params.id);
+    classPartialUpdate(jobToUpdate, req.body);
+    const updateJob = await jobToUpdate.updateJob();
+    return res.json({ job: updateJob });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 // //Delete a job
 // router.delete('/:id', async function (req, res, next) {
