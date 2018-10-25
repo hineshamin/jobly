@@ -58,15 +58,15 @@ router.patch('/:id', async function (
   }
 });
 
-// //Delete a job
-// router.delete('/:id', async function (req, res, next) {
-//   try {
-//     const companyToDelete = await Job.getJob(req.params.id);
-//     const message = await companyToDelete.deleteCompany();
-//     return res.json({ message });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Delete a job
+router.delete('/:id', async function (req, res, next) {
+  try {
+    const jobToDelete = await Job.getJob(req.params.id);
+    const message = await jobToDelete.deleteJob();
+    return res.json({ message });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 module.exports = router;

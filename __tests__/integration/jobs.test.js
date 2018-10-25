@@ -109,14 +109,14 @@ describe('PATCH /jobs/:id', () => {
   });
 });
 
-// //Test deleting a job route
-// describe('DELETE /jobs/:id', () => {
-//   it('should correctly delete a job', async function () {
-//     const response = await request(app).delete(`/jobs/${company1.id}`);
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.message).toBe('Company Deleted');
-//   });
-// });
+//Test deleting a job route
+describe('DELETE /jobs/:id', () => {
+  it('should correctly delete a job', async function () {
+    const response = await request(app).delete(`/jobs/${job1.id}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe('Job Deleted');
+  });
+});
 
 //Delete jobs and companies tables after each tets
 afterEach(async function () {
