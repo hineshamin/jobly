@@ -42,6 +42,8 @@ class User /* extends Model */ {
     return result.rows.map(user => new User(user));
   }
 
+
+
   //Create a new user and return an instance
   static async createUser({
     username,
@@ -64,7 +66,7 @@ class User /* extends Model */ {
         last_name,
         email,
         photo_url ||
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
         is_admin || false
       ]
     );
@@ -76,18 +78,34 @@ class User /* extends Model */ {
     return new User(result.rows[0]);
   }
 
+  // Authenticate user
+  static async authenticate({ username, password }) {
+    const result = await db.query(`
+      SELECT password, is_admin FROM users WHERE username=$1
+    `, [username]
+    );
+    const user = result.rows[0];
+    if (user) {
+      if (await bcrypt.compare(password, user.password)) {
+        const token = jwt.sign({ username, is_admin: user.is_admin }, SECRET);
+        return token;
+      }
+    }
+    throw new Error('Invalid username/password')
+  }
+
   //Get user and return an instance
   static async getUser(username) {
     let result = await db.query(
       `
-    SELECT username, password, first_name, last_name, email, photo_url
+    SELECT username, first_name, last_name, email, photo_url
     FROM users 
     WHERE username = $1`,
       [username]
     );
 
     if (result.rows.length === 0) {
-      const err = new Error('Cannot find user by that username');
+      const err = new Error(`Cannot find user by username: ${username}`);
       err.status = 400;
       throw err;
     }
@@ -104,10 +122,11 @@ class User /* extends Model */ {
     const { query, values } = sqlForPartialUpdate(
       'users',
       {
-        password: this.password,
+        username: this.username,
         first_name: this.first_name,
         last_name: this.last_name,
-        email: this.email
+        email: this.email,
+        photo_url: this.photo_url
       },
       'username',
       this.username
@@ -131,7 +150,7 @@ class User /* extends Model */ {
       [this.username]
     );
     if (result.rows.length === 0) {
-      throw new Error('Could not delete user');
+      throw new Error(`Could not delete user: ${this.username}`);
     }
     return 'User Deleted';
   }

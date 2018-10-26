@@ -3,11 +3,12 @@ const router = new express.Router();
 const User = require('../models/user');
 const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
-// const newUserSchema = require('../schema/newUser.json');
-// const updateUserSchema = require('../schema/updateUser.json');
+const newUserSchema = require('../schema/newUser.json');
+const updateUserSchema = require('../schema/updateUser.json');
+const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
 
-//Get a filtered list of users
-router.get('/', async function(req, res, next) {
+//Get a list of users
+router.get('/', async function (req, res, next) {
   try {
     const users = await User.getUsers();
     return res.json({ users });
@@ -17,50 +18,51 @@ router.get('/', async function(req, res, next) {
 });
 
 //Create a new user
-router.post('/', async function(req, res, next) {
+router.post('/', validateInput(newUserSchema), async function (req, res, next) {
   try {
-    const user = await User.createUser(req.body);
+    await User.createUser(req.body);
+    const token = await User.authenticate(req.body);
+    return res.json({ token });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+//Get a user by username
+router.get('/:username', ensureCorrectUser, async function (req, res, next) {
+  try {
+    const user = await User.getUser(req.params.username);
     return res.json({ user });
   } catch (error) {
     return next(error);
   }
 });
 
-// //Get a user by id
-// router.get('/:id', async function(req, res, next) {
-//   try {
-//     const user = await User.getUser(req.params.id);
-//     return res.json({ user });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Update a user
+router.patch('/:username', ensureCorrectUser, validateInput(updateUserSchema), async function (
+  req,
+  res,
+  next
+) {
+  try {
+    let user = await User.getUser(req.params.username);
+    user.updateFromValues(req.body);
+    await user.save();
+    return res.json({ user });
+  } catch (error) {
+    return next(error);
+  }
+});
 
-// //Update a user
-// router.patch('/:id', validateInput(updateUserSchema), async function(
-//   req,
-//   res,
-//   next
-// ) {
-//   try {
-//     let user = await User.getUser(req.params.id);
-//     user.updateFromValues(req.body);
-//     await user.save();
-//     return res.json({ user });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
-
-// //Delete a user
-// router.delete('/:id', async function(req, res, next) {
-//   try {
-//     const userToDelete = await User.getUser(req.params.id);
-//     const message = await userToDelete.deleteUser();
-//     return res.json({ message });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Delete a user
+router.delete('/:username', ensureCorrectUser, async function (req, res, next) {
+  try {
+    const user = await User.getUser(req.params.username);
+    const message = await user.deleteUser();
+    return res.json({ message });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 module.exports = router;

@@ -6,9 +6,10 @@ const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
 const newCompanySchema = require('../schema/newCompany.json');
 const updateCompanySchema = require('../schema/updateCompany.json');
+const { ensureLoggedIn, ensureCorrectUser, ensureAdminUser } = require('../middleware/auth');
 
 //Get a filtered list of companies
-router.get('/', async function(req, res, next) {
+router.get('/', ensureLoggedIn, async function (req, res, next) {
   try {
     const companiesResults = await Company.getFilteredCompanies(req.query);
     const companies = companiesResults.map(company => ({
@@ -22,7 +23,7 @@ router.get('/', async function(req, res, next) {
 });
 
 //Create a new company
-router.post('/', validateInput(newCompanySchema), async function(
+router.post('/', ensureAdminUser, validateInput(newCompanySchema), async function (
   req,
   res,
   next
@@ -36,7 +37,7 @@ router.post('/', validateInput(newCompanySchema), async function(
 });
 
 //Get a company by handle
-router.get('/:handle', async function(req, res, next) {
+router.get('/:handle', ensureLoggedIn, async function (req, res, next) {
   try {
     const company = await Company.getCompany(req.params.handle);
     const jobs = await Job.getFilteredJobs({ search: company.handle });
@@ -48,7 +49,7 @@ router.get('/:handle', async function(req, res, next) {
 });
 
 //Update a company
-router.patch('/:handle', validateInput(updateCompanySchema), async function(
+router.patch('/:handle', ensureAdminUser, validateInput(updateCompanySchema), async function (
   req,
   res,
   next
@@ -64,7 +65,7 @@ router.patch('/:handle', validateInput(updateCompanySchema), async function(
 });
 
 //Delete a company
-router.delete('/:handle', async function(req, res, next) {
+router.delete('/:handle', ensureAdminUser, async function (req, res, next) {
   try {
     const companyToDelete = await Company.getCompany(req.params.handle);
     const message = await companyToDelete.deleteCompany();
