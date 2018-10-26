@@ -2,6 +2,7 @@ process.env.NODE_ENV = 'test';
 const db = require('../../db');
 const request = require('supertest');
 const app = require('../../app');
+const User = require('../../models/user');
 
 let job1, job2, company1, company2, userToken;
 //Insert 2 jobs and commpanies before each test
@@ -70,11 +71,17 @@ beforeEach(async function () {
       last_name: 'johnson',
       email: 'bob@gmail.com'
     });
+
+  //make homeboy an admin
+  await db.query(`
+    UPDATE users SET is_admin = True WHERE username='bobcat';
+    `);
+
   company1 = result1.rows[0];
   company2 = result2.rows[0];
   job1 = result3.rows[0];
   job2 = result4.rows[0];
-  userToken = response.body.token;
+  userToken = await User.authenticate({ username: 'bobcat', password: 'bob' });
 });
 
 //Test get filtered companies route
@@ -113,7 +120,8 @@ describe('POST /companies', () => {
         num_employees: 5000,
         description: 'American media services provider',
         logo_url: 'http://netflix.com'
-      });
+      })
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.company._handle).toBe('NFLX');
 
@@ -125,7 +133,8 @@ describe('POST /companies', () => {
         num_employees: '5000',
         description: 'American media services provider',
         logo_url: 'bogusurl'
-      });
+      })
+      .query({ _token: userToken });
     expect(invalidResponse.statusCode).toBe(400);
   });
 });
@@ -157,7 +166,8 @@ describe('PATCH /companies/:handle', () => {
       .patch(`/companies/${company1.handle}`)
       .send({
         name: 'PEACH'
-      });
+      })
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.company._handle).toBe(company1.handle);
     expect(response.body.company.name).toBe('PEACH');
@@ -167,7 +177,8 @@ describe('PATCH /companies/:handle', () => {
       .send({
         num_employees: 'PEACH',
         name: 500
-      });
+      })
+      .query({ _token: userToken });
     expect(invalidResponse.statusCode).toBe(400);
   });
 });
@@ -175,7 +186,9 @@ describe('PATCH /companies/:handle', () => {
 //Test deleting a company route
 describe('DELETE /companies/:handle', () => {
   it('should correctly delete a company', async function () {
-    const response = await request(app).delete(`/companies/${company1.handle}`);
+    const response = await request(app)
+      .delete(`/companies/${company1.handle}`)
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe('Company Deleted');
   });

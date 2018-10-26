@@ -39,7 +39,25 @@ function ensureCorrectUser(req, res, next) {
   }
 }
 
+function ensureAdminUser(req, res, next) {
+  try {
+    const token = req.body._token || req.query._token;
+    const payload = jwt.verify(token, SECRET);
+    if (payload.is_admin) {
+      req.username = payload.username;
+      return next();
+    } else {
+      throw new Error();
+    }
+  }
+
+  catch (err) {
+    return next({ status: 401, message: "Unauthorized" });
+  }
+}
+
 module.exports = {
   ensureLoggedIn,
-  ensureCorrectUser
+  ensureCorrectUser,
+  ensureAdminUser
 };
