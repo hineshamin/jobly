@@ -5,6 +5,7 @@ const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
 const newUserSchema = require('../schema/newUser.json');
 const updateUserSchema = require('../schema/updateUser.json');
+const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
 
 //Get a list of users
 router.get('/', async function (req, res, next) {
@@ -28,7 +29,7 @@ router.post('/', validateInput(newUserSchema), async function (req, res, next) {
 });
 
 //Get a user by username
-router.get('/:username', async function (req, res, next) {
+router.get('/:username', ensureCorrectUser, async function (req, res, next) {
   try {
     const user = await User.getUser(req.params.username);
     return res.json({ user });
@@ -38,7 +39,7 @@ router.get('/:username', async function (req, res, next) {
 });
 
 //Update a user
-router.patch('/:username', validateInput(updateUserSchema), async function (
+router.patch('/:username', ensureCorrectUser, validateInput(updateUserSchema), async function (
   req,
   res,
   next
@@ -54,7 +55,7 @@ router.patch('/:username', validateInput(updateUserSchema), async function (
 });
 
 //Delete a user
-router.delete('/:username', async function (req, res, next) {
+router.delete('/:username', ensureCorrectUser, async function (req, res, next) {
   try {
     const user = await User.getUser(req.params.username);
     const message = await user.deleteUser();

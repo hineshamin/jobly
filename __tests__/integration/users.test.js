@@ -4,7 +4,7 @@ const request = require('supertest');
 const app = require('../../app');
 const User = require('../../models/user');
 
-let job1, job2, company1, company2, user1, user2;
+let job1, job2, company1, company2, user1, user2, user3, userToken;
 //Insert 2 users before each test
 beforeEach(async function () {
   //adding companies and related users for those companies to test
@@ -70,12 +70,24 @@ beforeEach(async function () {
   INSERT INTO users (username, password, first_name, last_name, email, is_admin)
   VALUES ('spongebob', 'garry', 'SpongeBob', 'SquarePants', 'sponge@gmail.com', False)
   RETURNING username, first_name, last_name, email, photo_url, is_admin`);
+  const response = await request(app)
+    .post('/users')
+    .send({
+      username: 'georgetheman',
+      password: 'georgeisawesome',
+      first_name: 'george',
+      last_name: 'johnson',
+      email: 'george@gmail.com'
+    });
+
   company1 = result1.rows[0];
   company2 = result2.rows[0];
   job1 = result3.rows[0];
   job2 = result4.rows[0];
   user1 = result5.rows[0];
   user2 = result6.rows[0];
+  user3 = await User.getUser('georgetheman')
+  userToken = response.body.token;
 });
 
 //Test get users route
@@ -83,7 +95,7 @@ describe('GET /users', () => {
   it('should correctly return a list of users', async function () {
     const response = await request(app).get('/users');
     expect(response.statusCode).toBe(200);
-    expect(response.body.users.length).toBe(2);
+    expect(response.body.users.length).toBe(3);
     expect(response.body.users[0]).toHaveProperty('_username', user1.username);
   });
 });
@@ -113,37 +125,18 @@ describe('POST /users', () => {
         email: 'bob.com'
       });
     expect(invalidResponse.statusCode).toBe(400);
-
-    //make fake non-existent database reference to throw
-    //error in route
-    // try {
-    //   await db.query(`DROP TABLE users`)
-    //   const response = await request(app)
-    //     .post('/users')
-    //     .send({
-    //       username: 'bobcat',
-    //       password: 'bob',
-    //       first_name: 'bob',
-    //       last_name: 'johnson',
-    //       email: 'bob@gmail.com'
-    //     });
-    // } catch (error) {
-    //   console.log('got here!');
-    //   expect(error.message).toMatch('Cannot create user');
-    // }
-    // await db.query(`CREATE TABLE users (
-    //   username text PRIMARY KEY);`)
   });
 });
 
 //Test get one user route
 describe('GET /users/:username', () => {
   it('should correctly return a user by username', async function () {
-    const response = await request(app).get(`/users/${user1.username}`);
+    console.log(user3.username);
+    const response = await request(app)
+      .get(`/users/${user3.username}`)
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
-    expect(response.body.user._username).toBe(user1.username);
-
-    //check try catch pattern of route
+    expect(response.body.user._username).toBe(user3.username);
   });
 });
 
@@ -151,19 +144,21 @@ describe('GET /users/:username', () => {
 describe('PATCH /users/:username', () => {
   it('should correctly update a user and return it', async function () {
     const response = await request(app)
-      .patch(`/users/${user1.username}`)
+      .patch(`/users/${user3.username}`)
       .send({
-        first_name: 'Josephina'
-      });
+        first_name: 'Josephina',
+      })
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
-    expect(response.body.user._username).toBe(user1.username);
+    expect(response.body.user._username).toBe(user3.username);
     expect(response.body.user.first_name).toBe('Josephina');
 
     const invalidResponse = await request(app)
-      .patch(`/users/${user1.username}`)
+      .patch(`/users/${user3.username}`)
       .send({
         first_name: 20,
-        last_name: null
+        last_name: null,
+        _token: userToken
       });
     expect(invalidResponse.statusCode).toBe(400);
   });
@@ -172,7 +167,11 @@ describe('PATCH /users/:username', () => {
 //Test deleting a user route
 describe('DELETE /users/:username', () => {
   it('should correctly delete a user', async function () {
-    const response = await request(app).delete(`/users/${user1.username}`);
+    const response = await request(app)
+      .delete(`/users/${user3.username}`)
+      .send({
+        _token: userToken
+      });
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe('User Deleted');
   });

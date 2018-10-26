@@ -3,7 +3,7 @@ const db = require('../../db');
 const request = require('supertest');
 const app = require('../../app');
 
-let job1, job2, company1, company2;
+let job1, job2, company1, company2, userToken;
 //Insert 2 jobs and commpanies before each test
 beforeEach(async function () {
   //adding companies and related jobs for testing
@@ -17,7 +17,7 @@ beforeEach(async function () {
       description text,
       logo_url text
     )
-  `)
+  `);
   await db.query(`      
     CREATE TABLE jobs
     (
@@ -28,7 +28,19 @@ beforeEach(async function () {
       company_handle text REFERENCES companies ON DELETE cascade,
       date_posted TIMESTAMP default CURRENT_TIMESTAMP
     )
-  `)
+  `);
+  await db.query(`
+  CREATE TABLE users
+  (
+    username text PRIMARY KEY,
+    password text NOT NULL,
+    first_name text NOT NULL,
+    last_name text NOT NULL,
+    email text NOT NULL UNIQUE,
+    photo_url text DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
+    is_admin boolean NOT NULL default false
+  )
+  `);
   let result1 = await db.query(`
   INSERT INTO companies (handle,name,num_employees,description,logo_url)
   VALUES ('AAPL','apple',123000,'Maker of hipster computers','http://www.apllogo.com')
@@ -49,16 +61,28 @@ beforeEach(async function () {
   VALUES ('JANITOR',80000,0.9,'GOOG')
   RETURNING id,title,salary,equity,company_handle,date_posted
   `);
+  const response = await request(app)
+    .post('/users')
+    .send({
+      username: 'bobcat',
+      password: 'bob',
+      first_name: 'bob',
+      last_name: 'johnson',
+      email: 'bob@gmail.com'
+    });
   company1 = result1.rows[0];
   company2 = result2.rows[0];
   job1 = result3.rows[0];
   job2 = result4.rows[0];
+  userToken = response.body.token;
 });
 
 //Test get filtered jobs route
 describe('GET /jobs', () => {
   it('should correctly return a filtered list of jobs', async function () {
-    const response = await request(app).get('/jobs');
+    const response = await request(app)
+      .get('/jobs')
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.jobs.length).toBe(2);
     expect(response.body.jobs[0]).toHaveProperty(
@@ -69,6 +93,12 @@ describe('GET /jobs', () => {
       'company_handle',
       job2.company_handle
     );
+
+    //test unauthorized
+    const response401 = await request(app)
+      .get(`/jobs`)
+      .query({ _token: 'BADTOKEN' });
+    expect(response401.statusCode).toBe(401);
   });
 });
 
@@ -101,9 +131,17 @@ describe('POST /jobs', () => {
 //Test get one job route
 describe('GET /jobs/:id', () => {
   it('should correctly return a job by id', async function () {
-    const response = await request(app).get(`/jobs/${job1.id}`);
+    const response = await request(app)
+      .get(`/jobs/${job1.id}`)
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.job._id).toBe(job1.id);
+
+    //test unauthorized
+    const response401 = await request(app)
+      .get(`/jobs/${job1.id}`)
+      .query({ _token: 'BADTOKEN' });
+    expect(response401.statusCode).toBe(401);
   });
 });
 
@@ -142,6 +180,7 @@ describe('DELETE /jobs/:id', () => {
 afterEach(async function () {
   await db.query(`DROP TABLE jobs`);
   await db.query(`DROP TABLE companies`);
+  await db.query(`DROP TABLE users`);
 });
 
 //Close db connection

@@ -43,7 +43,7 @@ function sqlForPartialUpdate(table, items, key, id) {
 function classPartialUpdate(classInstance, updateObj) {
   // Intentional: mutates in place
   for (let [key, value] of Object.entries(updateObj)) {
-    classInstance[key] = value;
+    if (classInstance[key]) classInstance[key] = value;
   }
 }
 

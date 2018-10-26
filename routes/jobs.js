@@ -5,9 +5,10 @@ const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
 const newJobSchema = require('../schema/newJob.json');
 const updateJobSchema = require('../schema/updateJob.json');
+const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
 
 //Get a filtered list of jobs
-router.get('/', async function(req, res, next) {
+router.get('/', ensureLoggedIn, async function (req, res, next) {
   try {
     const jobsResults = await Job.getFilteredJobs(req.query);
     const jobs = jobsResults.map(job => ({
@@ -21,7 +22,7 @@ router.get('/', async function(req, res, next) {
 });
 
 //Create a new job
-router.post('/', validateInput(newJobSchema), async function(req, res, next) {
+router.post('/', validateInput(newJobSchema), async function (req, res, next) {
   try {
     const job = await Job.createJob(req.body);
     return res.json({ job });
@@ -31,7 +32,7 @@ router.post('/', validateInput(newJobSchema), async function(req, res, next) {
 });
 
 //Get a job by id
-router.get('/:id', async function(req, res, next) {
+router.get('/:id', ensureLoggedIn, async function (req, res, next) {
   try {
     const job = await Job.getJob(req.params.id);
     return res.json({ job });
@@ -41,7 +42,7 @@ router.get('/:id', async function(req, res, next) {
 });
 
 //Update a job
-router.patch('/:id', validateInput(updateJobSchema), async function(
+router.patch('/:id', validateInput(updateJobSchema), async function (
   req,
   res,
   next
@@ -57,7 +58,7 @@ router.patch('/:id', validateInput(updateJobSchema), async function(
 });
 
 //Delete a job
-router.delete('/:id', async function(req, res, next) {
+router.delete('/:id', async function (req, res, next) {
   try {
     const jobToDelete = await Job.getJob(req.params.id);
     const message = await jobToDelete.deleteJob();

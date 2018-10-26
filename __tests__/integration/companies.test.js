@@ -3,11 +3,23 @@ const db = require('../../db');
 const request = require('supertest');
 const app = require('../../app');
 
-let job1, job2, company1, company2;
+let job1, job2, company1, company2, userToken;
 //Insert 2 jobs and commpanies before each test
 beforeEach(async function () {
   //adding companies and related jobs for testing
   //build up our test tables
+  await db.query(`
+  CREATE TABLE users
+  (
+    username text PRIMARY KEY,
+    password text NOT NULL,
+    first_name text NOT NULL,
+    last_name text NOT NULL,
+    email text NOT NULL UNIQUE,
+    photo_url text DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
+    is_admin boolean NOT NULL default false
+  )
+  `);
   await db.query(`
     CREATE TABLE companies
     (
@@ -49,16 +61,28 @@ beforeEach(async function () {
   VALUES ('JANITOR',80000,0.9,'GOOG')
   RETURNING id,title,salary,equity,company_handle,date_posted
   `);
+  const response = await request(app)
+    .post('/users')
+    .send({
+      username: 'bobcat',
+      password: 'bob',
+      first_name: 'bob',
+      last_name: 'johnson',
+      email: 'bob@gmail.com'
+    });
   company1 = result1.rows[0];
   company2 = result2.rows[0];
   job1 = result3.rows[0];
   job2 = result4.rows[0];
+  userToken = response.body.token;
 });
 
 //Test get filtered companies route
 describe('GET /companies', () => {
   it('should correctly return a filtered list of companies', async function () {
-    const response = await request(app).get('/companies');
+    const response = await request(app)
+      .get('/companies')
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.companies.length).toBe(2);
     expect(response.body.companies[0]).toHaveProperty(
@@ -67,8 +91,14 @@ describe('GET /companies', () => {
     );
     const response400 = await request(app)
       .get('/companies')
-      .query({ min: 100, max: 1 });
+      .query({ min: 100, max: 1, _token: userToken });
     expect(response400.statusCode).toBe(400);
+
+    //test no token - unauthorized
+    const response401 = await request(app)
+      .get('/companies')
+      .query({ _token: 'BADTOKEN' });
+    expect(response401.statusCode).toBe(401);
   });
 });
 
@@ -103,12 +133,20 @@ describe('POST /companies', () => {
 //Test get one company route
 describe('GET /companies/:handle', () => {
   it('should correctly return a company by handle', async function () {
-    const response = await request(app).get(`/companies/${company1.handle}`);
+    const response = await request(app)
+      .get(`/companies/${company1.handle}`)
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.company._handle).toBe(company1.handle);
 
     //test that company contains an array of jobs on it's key of jobs
     expect(response.body.company.jobs.length).toBe(1);
+
+    //test unauthorized
+    const response401 = await request(app)
+      .get(`/companies/${company1.handle}`)
+      .query({ _token: 'BADTOKEN' });
+    expect(response401.statusCode).toBe(401);
   });
 });
 
@@ -147,6 +185,7 @@ describe('DELETE /companies/:handle', () => {
 afterEach(async function () {
   await db.query(`DROP TABLE jobs`);
   await db.query(`DROP TABLE companies`);
+  await db.query(`DROP TABLE users`);
 });
 
 //Close db connection
