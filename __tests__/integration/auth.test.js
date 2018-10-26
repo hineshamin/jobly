@@ -3,28 +3,15 @@ const db = require('../../db');
 const request = require('supertest');
 const app = require('../../app');
 const User = require('../../models/user');
+const { createTables, dropTables } = require('../../test_helpers/setup');
 
-let user1, user2;
-//Insert 2 users before each test
-beforeEach(async function () {
-  await db.query(`
-    CREATE TABLE users
-    (
-      username text PRIMARY KEY,
-      password text NOT NULL,
-      first_name text NOT NULL,
-      last_name text NOT NULL,
-      email text NOT NULL UNIQUE,
-      photo_url text DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
-      is_admin boolean NOT NULL default false
-    )
-  `)
+beforeEach(async function() {
+  await createTables();
 });
-
 
 //Test create user route
 describe('POST /auth/login', () => {
-  it('should correctly create a new user and return it', async function () {
+  it('should correctly create a new user and return it', async function() {
     const response = await request(app)
       .post('/users')
       .send({
@@ -46,11 +33,11 @@ describe('POST /auth/login', () => {
 });
 
 //Delete users and companies tables after each tets
-afterEach(async function () {
-  await db.query(`DROP TABLE users;`);
+afterEach(async function() {
+  await dropTables();
 });
 
 //Close db connection
-afterAll(async function () {
+afterAll(async function() {
   await db.end();
 });

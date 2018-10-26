@@ -93,7 +93,7 @@ class Company {
     return new Company(result.rows[0]);
   }
 
-  //Update the company instance attributes
+  //Takes in an object of values and updates this class instance with those values
   updateFromValues(vals) {
     classPartialUpdate(this, vals);
   }

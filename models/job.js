@@ -82,6 +82,7 @@ class Job /* extends Model */ {
     return new Job(result.rows[0]);
   }
 
+  //Takes in an object of values and updates this class instance with those values
   updateFromValues(vals) {
     classPartialUpdate(this, vals);
   }

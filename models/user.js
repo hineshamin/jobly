@@ -4,7 +4,7 @@ const {
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 const bcrypt = require('bcrypt');
-const { BWF, SECRET } = require('../config');
+const { BCRYPT_WORK_FACTOR, SECRET, DEFAULT_PHOTO } = require('../config');
 const jwt = require('jsonwebtoken');
 
 class User /* extends Model */ {
@@ -42,8 +42,6 @@ class User /* extends Model */ {
     return result.rows.map(user => new User(user));
   }
 
-
-
   //Create a new user and return an instance
   static async createUser({
     username,
@@ -61,12 +59,11 @@ class User /* extends Model */ {
     RETURNING username, first_name, last_name, email, photo_url, is_admin`,
       [
         username,
-        await bcrypt.hash(password, BWF),
+        await bcrypt.hash(password, BCRYPT_WORK_FACTOR),
         first_name,
         last_name,
         email,
-        photo_url ||
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
+        photo_url || DEFAULT_PHOTO,
         is_admin || false
       ]
     );
@@ -80,9 +77,11 @@ class User /* extends Model */ {
 
   // Authenticate user
   static async authenticate({ username, password }) {
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT password, is_admin FROM users WHERE username=$1
-    `, [username]
+    `,
+      [username]
     );
     const user = result.rows[0];
     if (user) {
@@ -91,7 +90,7 @@ class User /* extends Model */ {
         return token;
       }
     }
-    throw new Error('Invalid username/password')
+    throw new Error('Invalid username/password');
   }
 
   //Get user and return an instance
@@ -113,6 +112,7 @@ class User /* extends Model */ {
     return new User(result.rows[0]);
   }
 
+  //Takes in an object of values and updates this class instance with those values
   updateFromValues(vals) {
     classPartialUpdate(this, vals);
   }

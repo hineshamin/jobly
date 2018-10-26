@@ -27,4 +27,13 @@ CREATE TABLE users
   photo_url text
     DEFAULT 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg',
   is_admin boolean NOT NULL default false
-)
+);
+
+CREATE TABLE applications
+(
+  username text REFERENCES users ON DELETE CASCADE,
+  job_id int REFERENCES jobs ON DELETE CASCADE,
+  state text NOT NULL,
+  created_at timestamp default CURRENT_TIMESTAMP,
+  PRIMARY KEY(username,job_id)
+);

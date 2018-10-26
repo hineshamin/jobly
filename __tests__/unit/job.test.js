@@ -1,66 +1,24 @@
 process.env.NODE_ENV = 'test';
 const Job = require('../../models/job');
 const db = require('../../db');
+const {
+  createTables,
+  insertTestData,
+  dropTables
+} = require('../../test_helpers/setup');
 
-let job1;
-let job2;
-let company1;
-let company2;
-//Insert 2 jobs before each test
-beforeEach(async function () {
-  //adding companies and related jobs for those companies to test
+let job1, job2, company1, company2, user1, user2;
+//Insert 2 users before each test
+beforeEach(async function() {
+  //adding companies and related users for those companies to test
   //build up our test tables
-  await db.query(`
-    CREATE TABLE companies
-    (
-      handle text PRIMARY KEY,
-      name text NOT NULL UNIQUE,
-      num_employees int,
-      description text,
-      logo_url text
-    )
-  `)
-  await db.query(`      
-    CREATE TABLE jobs
-    (
-      id SERIAL PRIMARY KEY,
-      title text NOT NULL,
-      salary float NOT NULL,
-      equity float NOT NULL CHECK(equity BETWEEN 0 and 1),
-      company_handle text REFERENCES companies ON DELETE cascade,
-      date_posted TIMESTAMP default CURRENT_TIMESTAMP
-    )
-  `)
-
-  let result1 = await db.query(`
-  INSERT INTO companies (handle,name,num_employees,description,logo_url)
-  VALUES ('AAPL','apple',123000,'Maker of hipster computers','http://www.apllogo.com')
-  RETURNING handle,name,num_employees,description,logo_url
-  `);
-  let result2 = await db.query(`
-  INSERT INTO companies (handle,name,num_employees,description,logo_url)
-  VALUES ('GOOG','google',70000,'Search engine giant','http://www.google.com')
-  RETURNING handle,name,num_employees,description,logo_url
-  `);
-  let result3 = await db.query(`
-  INSERT INTO jobs (title,salary,equity,company_handle)
-  VALUES ('CEO',1123000,0.7,'AAPL')
-  RETURNING id, title,salary,equity,company_handle, date_posted
-  `);
-  let result4 = await db.query(`
-  INSERT INTO jobs (title,salary,equity,company_handle)
-  VALUES ('JANITOR',80000,0.9,'GOOG')
-  RETURNING id,title,salary,equity,company_handle,date_posted
-  `);
-  company1 = result1.rows[0];
-  company2 = result2.rows[0];
-  job1 = result3.rows[0];
-  job2 = result4.rows[0];
+  await createTables();
+  ({ company1, company2, job1, job2, user1, user2 } = await insertTestData());
 });
 
 //Test get filtered jobs
 describe('getFilteredJobs()', () => {
-  it('should correctly return a filtered list of jobs', async function () {
+  it('should correctly return a filtered list of jobs', async function() {
     const jobs = await Job.getFilteredJobs({});
     expect(jobs.length).toEqual(2);
     expect(jobs[0]).toHaveProperty('id', job1.id);
@@ -82,7 +40,7 @@ describe('getFilteredJobs()', () => {
 
 //Test creating job
 describe('createJob()', () => {
-  it('should correctly add a job', async function () {
+  it('should correctly add a job', async function() {
     const newJob = await Job.createJob({
       title: 'SOFTWARE DEVELOPER',
       salary: 5000,
@@ -98,7 +56,7 @@ describe('createJob()', () => {
 
 //Test get one job
 describe('getJob()', () => {
-  it('should correctly return a job by id', async function () {
+  it('should correctly return a job by id', async function() {
     const job = await Job.getJob(job1.id);
     expect(job.id).toEqual(job1.id);
     expect(job.salary).toEqual(job1.salary);
@@ -106,6 +64,7 @@ describe('getJob()', () => {
     //get a job that doesn't exist and check failure
     try {
       await Job.getJob(0);
+      throw new Error();
     } catch (e) {
       expect(e.message).toMatch('Cannot find job by that id');
     }
@@ -114,7 +73,7 @@ describe('getJob()', () => {
 
 //Update a job test
 describe('updateJob()', () => {
-  it('should correctly update a job', async function () {
+  it('should correctly update a job', async function() {
     let job = await Job.getJob(job1.id);
     job.title = 'WINDOW WASHER';
 
@@ -134,7 +93,7 @@ describe('updateJob()', () => {
 
 //Delete a job test
 describe('deleteJob()', () => {
-  it('should correctly delete a job', async function () {
+  it('should correctly delete a job', async function() {
     const jobtobeDeleted = await Job.getJob(job1.id);
     const message = await jobtobeDeleted.deleteJob();
     expect(message).toBe('Job Deleted');
@@ -142,12 +101,11 @@ describe('deleteJob()', () => {
 });
 
 //Delete jobs and companies tables after each tets
-afterEach(async function () {
-  await db.query(`DROP TABLE jobs`);
-  await db.query(`DROP TABLE companies`);
+afterEach(async function() {
+  await dropTables();
 });
 
 //Close db connection
-afterAll(async function () {
+afterAll(async function() {
   await db.end();
 });

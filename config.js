@@ -2,8 +2,10 @@
 
 require('dotenv').config();
 
+const DEFAULT_PHOTO =
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg';
 const SECRET = process.env.SECRET_KEY || 'test';
-const BWF = process.env.BWF || 10;
+const BCRYPT_WORK_FACTOR = process.env.BCRYPT_WORK_FACTOR || 10;
 
 const PORT = +process.env.PORT || 3000;
 
@@ -27,5 +29,6 @@ module.exports = {
   SECRET,
   PORT,
   DB_URI,
-  BWF
+  BCRYPT_WORK_FACTOR,
+  DEFAULT_PHOTO
 };
