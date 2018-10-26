@@ -2,6 +2,7 @@ process.env.NODE_ENV = 'test';
 const db = require('../../db');
 const request = require('supertest');
 const app = require('../../app');
+const User = require('../../models/user');
 
 let job1, job2, company1, company2, userToken;
 //Insert 2 jobs and commpanies before each test
@@ -70,11 +71,17 @@ beforeEach(async function () {
       last_name: 'johnson',
       email: 'bob@gmail.com'
     });
+
+  //make homeboy an admin
+  await db.query(`
+  UPDATE users SET is_admin = True WHERE username='bobcat';
+  `);
+
   company1 = result1.rows[0];
   company2 = result2.rows[0];
   job1 = result3.rows[0];
   job2 = result4.rows[0];
-  userToken = response.body.token;
+  userToken = await User.authenticate({ username: 'bobcat', password: 'bob' });
 });
 
 //Test get filtered jobs route
@@ -112,7 +119,8 @@ describe('POST /jobs', () => {
         salary: 5000,
         equity: 0.01,
         company_handle: 'GOOG',
-      });
+      })
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.job.title).toBe('SOFTWARE DEVELOPER');
 
@@ -123,7 +131,8 @@ describe('POST /jobs', () => {
         salary: 'FiveThousand',
         equity: 'janitorlevel',
         company_handle: 20,
-      });
+      })
+      .query({ _token: userToken });
     expect(invalidResponse.statusCode).toBe(400);
   });
 });
@@ -152,7 +161,8 @@ describe('PATCH /jobs/:id', () => {
       .patch(`/jobs/${job1.id}`)
       .send({
         title: 'WINDOW WASHER'
-      });
+      })
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.job._id).toBe(job1.id);
     expect(response.body.job.title).toBe('WINDOW WASHER');
@@ -162,7 +172,8 @@ describe('PATCH /jobs/:id', () => {
       .send({
         title: 20,
         equity: 500
-      });
+      })
+      .query({ _token: userToken });
     expect(invalidResponse.statusCode).toBe(400);
   });
 });
@@ -170,7 +181,9 @@ describe('PATCH /jobs/:id', () => {
 //Test deleting a job route
 describe('DELETE /jobs/:id', () => {
   it('should correctly delete a job', async function () {
-    const response = await request(app).delete(`/jobs/${job1.id}`);
+    const response = await request(app)
+      .delete(`/jobs/${job1.id}`)
+      .query({ _token: userToken });
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe('Job Deleted');
   });
